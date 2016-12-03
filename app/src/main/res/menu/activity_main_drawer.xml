@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_available_rides"
+            android:icon="@drawable/ic_thumb"
+            android:title="@string/item_menu_available_rides" />
+        <item
+            android:id="@+id/nav_my_profile"
+            android:icon="@drawable/ic_account"
+            android:title="@string/item_menu_my_profile" />
+        <item
+            android:id="@+id/nav_my_ride"
+            android:icon="@drawable/ic_car"
+            android:title="@string/item_menu_my_ride" />
+        <item
+            android:id="@+id/nav_change_vehicle"
+            android:icon="@drawable/ic_change_vehicle"
+            android:title="@string/item_menu_change_vehicle" />
+        <item
+            android:id="@+id/nav_my_evaluations"
+            android:icon="@drawable/ic_star"
+            android:title="@string/item_menu_my_evaluations" />
+        <item
+            android:id="@+id/nav_ride_history"
+            android:icon="@drawable/ic_history"
+            android:title="@string/item_menu_ride_history" />
+        <item
+            android:id="@+id/nav_account_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/item_menu_account_settings" />
+    </group>
+
+    <item android:title="@string/help_us">
+        <menu>
+            <item
+                android:id="@+id/nav_donate"
+                android:icon="@drawable/ic_cash"
+                android:title="@string/item_menu_donate" />
+            <item
+                android:id="@+id/nav_send_email"
+                android:icon="@drawable/ic_send"
+                android:title="@string/item_menu_send_email" />
+        </menu>
+    </item>
+
+</menu>
