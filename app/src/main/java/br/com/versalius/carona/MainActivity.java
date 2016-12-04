@@ -2,27 +2,39 @@ package br.com.versalius.carona;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import br.com.versalius.carona.adapters.RideAdapter;
+import br.com.versalius.carona.models.Ride;
+import br.com.versalius.carona.models.User;
+import br.com.versalius.carona.models.Vehicle;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         toolbar.setTitle(getResources().getString(R.string.item_menu_available_rides));
+        setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -41,6 +53,75 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        setUpRecycleView();
+    }
+
+    private void setUpRecycleView() {
+        recyclerView = (RecyclerView) findViewById(R.id.rvRides);
+        recyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(manager);
+
+        RideAdapter adapter = new RideAdapter(getRides(),this);
+
+        recyclerView.setAdapter(adapter);
+    }
+
+    private List<Ride> getRides() {
+        Vehicle car1, car2, car3, car4, car5, moto;
+        car1 = new Vehicle(1, Vehicle.VEHICLE_TYPE_CAR, "Volkswagen", "Fusca", false, 2, 3, "ABC-1234", "Vermelho", "#FF0000", null, null);
+        car2 = new Vehicle(2, Vehicle.VEHICLE_TYPE_CAR, "Volkswagen", "CrossFox", true, 4, 4, "DEF-5687", "Branco", "#FFFFFF", null, null);
+        car3 = new Vehicle(3, Vehicle.VEHICLE_TYPE_CAR, "FIAT", "Uno", false, 4, 2, "DEF-5687", "Preto", "#000000", null, null);
+        car4 = new Vehicle(4, Vehicle.VEHICLE_TYPE_CAR, "Chevrolet", "Cobalt", true, 4, 4, "DEF-5687", "Laranja", "#FF5000", null, null);
+        car5 = new Vehicle(5, Vehicle.VEHICLE_TYPE_CAR, "Mitsibushi", "Pajero", true, 4, 1, "DEF-5687", "Amarelo", "#FFFF00", null, null);
+        moto = new Vehicle(6, Vehicle.VEHICLE_TYPE_MOTO, "Honda", "Pop 100", false, 0, 1, "DEF-5687", "Azul", "#0000FF", null, null);
+
+        User driver1, driver2, driver3, driver4, driver5, driver6;
+        driver1 = new User(1, car1, "Jorge", "Andrade", "Ilhéus", "Nelson Costa", null, "carlos.andrade@email.com", "1234", R.drawable.profile_circle3);
+        driver2 = new User(2, car2, "Paula", "Cardoso", "Itabuna", "São Caetano", null, "paula.cardoso@email.com", "1234", R.drawable.ic_profile_placeholder);
+        driver3 = new User(3, car3, "Alessandra", "Borges", "Itabuna", "Sarinha", null, "alessandra.broges@email.com", "1234", R.drawable.profile_circle);
+        driver4 = new User(4, car4, "Carine", "Jade", "Ilhéus", "Centro", null, "carine.jade@email.com", "1234", R.drawable.ic_profile_placeholder);
+        driver5 = new User(5, car5, "Juliana", "Britto", "Ilhéus", "Pacheco", null, "juliana.britto@email.com", "1234", R.drawable.profile_circle5);
+        driver6 = new User(6, moto, "Matheus", "Almeida", "Ilhéus", "Olivença", null, "metheus.almeida@email.com", "1234", R.drawable.ic_profile_placeholder);
+
+        User passenger1, passenger2, passenger3, passenger4, passenger5;
+        passenger1 = new User(7, null, "Adriana", "Silva", "Ilhéus", "Nelson Costa", null, "adriana.silva@email.com", "1234", R.drawable.ic_profile_placeholder);
+        passenger2 = new User(8, null, "Paulo", "Machado", "Ilhéus", "Pontal", null, "paulo.machado@email.com", "1234", R.drawable.profile_circle4);
+        passenger3 = new User(8, null, "Bruno", "Azevedo", "Itabuna", "Centro", null, "bruno.azevedo@email.com", "1234", R.drawable.ic_profile_placeholder);
+        passenger4 = new User(10, null, "Flávia", "Dias", "Itabuna", "São Pedro", null, "flavia.dias@email.com", "1234", R.drawable.profile_circle2);
+        passenger5 = new User(11, null, "Lucas", "Freire", "Ilhéus", "Centro", null, "lucas.freire@email.com", "1234", R.drawable.ic_profile_placeholder);
+
+        List<User> passengers1, passengers2;
+        passengers1 = new ArrayList<>();
+        passengers2 = new ArrayList<>();
+
+        passengers1.add(passenger1);
+        passengers1.add(passenger2);
+        passengers1.add(passenger3);
+
+        passengers2.add(passenger4);
+        passengers2.add(passenger5);
+
+        Ride ride1, ride2, ride3, ride4, ride5, ride6;
+        ride1 = new Ride(1, driver1, passengers1, Ride.RIDE_OPEN, 0, "Guarita", "Ilhéus", "Nelson Costa", null);
+        ride2 = new Ride(2, driver2, null, Ride.RIDE_OPEN, 0, "Pav. Jorge Amado", "Ilhéus", "Pacheco", null);
+        ride3 = new Ride(3, driver3, null, Ride.RIDE_OPEN, 0, "Guarita", "Itabuna", "Sarinha", null);
+        ride4 = new Ride(4, driver4, passengers2, Ride.RIDE_OPEN, 0, "Biblioteca", "Itabuna", "Centro", null);
+        ride5 = new Ride(5, driver5, null, Ride.RIDE_OPEN, 0, "Pav. Jorge Amado", "Itabuna", "Pontalzinho", null);
+        ride6 = new Ride(6, driver6, null, Ride.RIDE_OPEN, 0, "Pav. Max de Menezes", "Ilhéus", "Centro", null);
+
+        List<Ride> rides = new ArrayList<>();
+        rides.add(ride1);
+        rides.add(ride2);
+        rides.add(ride3);
+        rides.add(ride4);
+        rides.add(ride5);
+        rides.add(ride6);
+
+        return rides;
     }
 
     @Override
