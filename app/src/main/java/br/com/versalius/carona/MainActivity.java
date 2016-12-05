@@ -14,6 +14,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recyclerView;
+    private boolean isOpen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,14 +39,7 @@ public class MainActivity extends AppCompatActivity
         toolbar.setTitle(getResources().getString(R.string.item_menu_available_rides));
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        setUpFabs();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -54,6 +51,37 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         setUpRecycleView();
+    }
+
+    private void setUpFabs() {
+        final FloatingActionButton fabCar = (FloatingActionButton) findViewById(R.id.fabCar);
+        final FloatingActionButton fabMoto = (FloatingActionButton) findViewById(R.id.fabMoto);
+
+        final Animation fabOpen, fabClose;
+        fabOpen = AnimationUtils.loadAnimation(this, R.anim.fab_open);
+        fabClose = AnimationUtils.loadAnimation(this, R.anim.fab_close);
+
+        FloatingActionButton fabAdd = (FloatingActionButton) findViewById(R.id.fab);
+        fabAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+                if(isOpen){
+                    fabCar.startAnimation(fabClose);
+                    fabMoto.startAnimation(fabClose);
+                    fabCar.setVisibility(View.INVISIBLE);
+                    fabMoto.setVisibility(View.INVISIBLE);
+                    isOpen = false;
+                } else {
+                    fabCar.startAnimation(fabOpen);
+                    fabMoto.startAnimation(fabOpen);
+                    fabCar.setVisibility(View.VISIBLE);
+                    fabMoto.setVisibility(View.VISIBLE);
+                    isOpen = true;
+                }
+            }
+        });
     }
 
     private void setUpRecycleView() {
@@ -79,7 +107,7 @@ public class MainActivity extends AppCompatActivity
         moto = new Vehicle(6, Vehicle.VEHICLE_TYPE_MOTO, "Honda", "Pop 100", false, 0, 1, "DEF-5687", "Azul", "#0000FF", null, null);
 
         User driver1, driver2, driver3, driver4, driver5, driver6;
-        driver1 = new User(1, car1, "Jorge", "Andrade", "Ilhéus", "Nelson Costa", null, "carlos.andrade@email.com", "1234", R.drawable.profile_circle3);
+        driver1 = new User(1, car1, "Jorge", "Andrade", "Ilhéus", "N. Sra. da Vitória", null, "carlos.andrade@email.com", "1234", R.drawable.profile_circle3);
         driver2 = new User(2, car2, "Paula", "Cardoso", "Itabuna", "São Caetano", null, "paula.cardoso@email.com", "1234", R.drawable.ic_profile_placeholder);
         driver3 = new User(3, car3, "Alessandra", "Borges", "Itabuna", "Sarinha", null, "alessandra.broges@email.com", "1234", R.drawable.profile_circle);
         driver4 = new User(4, car4, "Carine", "Jade", "Ilhéus", "Centro", null, "carine.jade@email.com", "1234", R.drawable.ic_profile_placeholder);
@@ -87,7 +115,7 @@ public class MainActivity extends AppCompatActivity
         driver6 = new User(6, moto, "Matheus", "Almeida", "Ilhéus", "Olivença", null, "metheus.almeida@email.com", "1234", R.drawable.ic_profile_placeholder);
 
         User passenger1, passenger2, passenger3, passenger4, passenger5;
-        passenger1 = new User(7, null, "Adriana", "Silva", "Ilhéus", "Nelson Costa", null, "adriana.silva@email.com", "1234", R.drawable.ic_profile_placeholder);
+        passenger1 = new User(7, null, "Adriana", "Silva", "Ilhéus", "N. Sra. da Vitória", null, "adriana.silva@email.com", "1234", R.drawable.ic_profile_placeholder);
         passenger2 = new User(8, null, "Paulo", "Machado", "Ilhéus", "Pontal", null, "paulo.machado@email.com", "1234", R.drawable.profile_circle4);
         passenger3 = new User(8, null, "Bruno", "Azevedo", "Itabuna", "Centro", null, "bruno.azevedo@email.com", "1234", R.drawable.ic_profile_placeholder);
         passenger4 = new User(10, null, "Flávia", "Dias", "Itabuna", "São Pedro", null, "flavia.dias@email.com", "1234", R.drawable.profile_circle2);
@@ -105,7 +133,7 @@ public class MainActivity extends AppCompatActivity
         passengers2.add(passenger5);
 
         Ride ride1, ride2, ride3, ride4, ride5, ride6;
-        ride1 = new Ride(1, driver1, passengers1, Ride.RIDE_OPEN, 0, "Guarita", "Ilhéus", "Nelson Costa", null);
+        ride1 = new Ride(1, driver1, passengers1, Ride.RIDE_OPEN, 0, "Guarita", "Ilhéus", "N. Sra. da Vitória", null);
         ride2 = new Ride(2, driver2, null, Ride.RIDE_OPEN, 0, "Pav. Jorge Amado", "Ilhéus", "Pacheco", null);
         ride3 = new Ride(3, driver3, null, Ride.RIDE_OPEN, 0, "Guarita", "Itabuna", "Sarinha", null);
         ride4 = new Ride(4, driver4, passengers2, Ride.RIDE_OPEN, 0, "Biblioteca", "Itabuna", "Centro", null);

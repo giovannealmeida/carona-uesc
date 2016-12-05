@@ -12,7 +12,7 @@
             android:title="@string/item_menu_my_profile" />
         <item
             android:id="@+id/nav_my_ride"
-            android:icon="@drawable/ic_car"
+            android:icon="@drawable/ic_car_black"
             android:title="@string/item_menu_my_ride" />
         <item
             android:id="@+id/nav_change_vehicle"

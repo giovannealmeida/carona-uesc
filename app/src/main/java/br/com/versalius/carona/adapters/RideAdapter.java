@@ -2,8 +2,6 @@ package br.com.versalius.carona.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.media.Image;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,13 +16,14 @@ import java.util.List;
 
 import br.com.versalius.carona.R;
 import br.com.versalius.carona.models.Ride;
+import br.com.versalius.carona.models.Vehicle;
 import br.com.versalius.carona.utils.PreferencesHelper;
 
 /**
  * Created by Giovanne on 03/12/2016.
  */
 
-public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder>{
+public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
 
     private List<Ride> list;
     private LayoutInflater inflater;
@@ -38,28 +37,43 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder>{
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.item_ride,parent,false);
+        View view = inflater.inflate(R.layout.item_ride, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.tvDriverName.setText(list.get(position).getDriver().getFullName());
+        holder.tvDriverName.setSelected(true);
+
         holder.tvTime.setText(list.get(position).getDepartTimeString());
         holder.tvAvailableSits.setText(String.valueOf(list.get(position).getAvailableSits()));
+        if(list.get(position).getDriver().getVehicle().getType() == Vehicle.VEHICLE_TYPE_MOTO){
+            holder.tvAvailableSits.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_moto_black),null,null,null);
+        }
+
         holder.tvOrigin.setText(list.get(position).getOrigin());
+        holder.tvOrigin.setSelected(true);
+
         holder.tvDestination.setText(list.get(position).getFullDestination());
+        holder.tvDestination.setSelected(true);
+
         holder.ivProfile.setImageResource(list.get(position).getDriver().getPhoto());
-        if(list.get(position).getAvailableSits() == 0){
+        if (list.get(position).getAvailableSits() == 0) {
             holder.btGetRide.setEnabled(false);
             holder.btGetRide.setText("Cheia");
-            holder.btGetRide.setTextColor(Color.BLACK);
             holder.btGetRide.setBackgroundColor(Color.GRAY);
         }
+
+        if (isInRide(list.get(position).getId())) {
+            holder.btGetRide.setText("Sair");
+            holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary));
+        }
+
         holder.btGetRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(PreferencesHelper.getInstance(context).load("currentRideId").isEmpty()) {
+                if (PreferencesHelper.getInstance(context).load("currentRideId").isEmpty()) {
                     holder.btGetRide.setText("Sair");
                     holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary));
                     try {
@@ -67,19 +81,23 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder>{
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } else if(PreferencesHelper.getInstance(context).load("currentRideId").equals(String.valueOf(list.get(position).getId()))) {
+                } else if (isInRide(list.get(position).getId())) {
                     holder.btGetRide.setText("Entrar");
-                    holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
+                    holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorButton));
                     try {
                         PreferencesHelper.getInstance(context).save("currentRideId", "");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(context,"Você já está numa carona",Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Você já está numa carona", Toast.LENGTH_LONG).show();
                 }
             }
         });
+    }
+
+    private boolean isInRide(int rideId) {
+        return PreferencesHelper.getInstance(context).load("currentRideId").equals(String.valueOf(rideId));
     }
 
     @Override
