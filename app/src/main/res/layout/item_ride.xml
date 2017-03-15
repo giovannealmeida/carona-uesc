@@ -117,5 +117,6 @@
             android:text="Entrar"
             android:textColor="@android:color/white"
             android:theme="@style/Widget.AppCompat.Button.Small" />
-    </LinearLayout>
+    </Linea
+        rLayout>
 </RelativeLayout>
