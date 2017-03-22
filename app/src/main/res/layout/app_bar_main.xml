@@ -23,34 +23,70 @@
 
     <include layout="@layout/content_main" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabMoto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="150dp"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:src="@drawable/ic_moto_white"
-        android:visibility="invisible" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabCar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="90dp"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:src="@drawable/ic_car_white"
-        android:visibility="invisible" />
-
-    <android.support.design.widget.FloatingActionButton
+    <com.github.clans.fab.FloatingActionMenu xmlns:fab="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_car_add" />
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        fab:menu_colorNormal="@color/colorAccent"
+        fab:menu_colorPressed="@color/colorAccent"
+        fab:menu_fab_label="Criar carona"
+        fab:menu_icon="@drawable/ic_car_add"
+        fab:menu_labels_ellipsize="end"
+        fab:menu_labels_singleLine="true">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabMoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_moto_white"
+            fab:fab_colorNormal="@color/colorAccent"
+            fab:fab_colorPressed="@color/colorAccent"
+            fab:fab_label="Moto"
+            fab:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabCar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_car_white"
+            fab:fab_colorNormal="@color/colorAccent"
+            fab:fab_colorPressed="@color/colorAccent"
+            fab:fab_label="Carro"
+            fab:fab_size="mini" />
+
+    </com.github.clans.fab.FloatingActionMenu>
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <!--android:id="@+id/fabMoto"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|end"-->
+    <!--android:layout_marginBottom="150dp"-->
+    <!--android:layout_marginRight="@dimen/fab_margin"-->
+    <!--android:layout_marginEnd="@dimen/fab_margin"-->
+    <!--android:src="@drawable/ic_moto_white"-->
+    <!--android:visibility="invisible" />-->
+
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <!--android:id="@+id/fabCar"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|end"-->
+    <!--android:layout_marginBottom="90dp"-->
+    <!--android:layout_marginRight="@dimen/fab_margin"-->
+    <!--android:layout_marginEnd="@dimen/fab_margin"-->
+    <!--android:src="@drawable/ic_car_white"-->
+    <!--android:visibility="invisible" />-->
+
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <!--android:id="@+id/fab"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|end"-->
+    <!--android:layout_margin="@dimen/fab_margin"-->
+    <!--android:src="@drawable/ic_car_add" />-->
 
 </android.support.design.widget.CoordinatorLayout>

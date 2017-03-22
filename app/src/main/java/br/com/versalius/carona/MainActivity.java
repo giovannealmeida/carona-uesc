@@ -1,9 +1,7 @@
 package br.com.versalius.carona;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,8 +12,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.widget.Toast;
+
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recyclerView;
-    private boolean isOpen;
+    private FloatingActionMenu fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,32 +54,24 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setUpFabs() {
+        fab = (FloatingActionMenu) findViewById(R.id.fab);
+        fab.setIconAnimated(false);
+        fab.setClosedOnTouchOutside(true);
         final FloatingActionButton fabCar = (FloatingActionButton) findViewById(R.id.fabCar);
         final FloatingActionButton fabMoto = (FloatingActionButton) findViewById(R.id.fabMoto);
 
-        final Animation fabOpen, fabClose;
-        fabOpen = AnimationUtils.loadAnimation(this, R.anim.fab_open);
-        fabClose = AnimationUtils.loadAnimation(this, R.anim.fab_close);
-
-        FloatingActionButton fabAdd = (FloatingActionButton) findViewById(R.id.fab);
-        fabAdd.setOnClickListener(new View.OnClickListener() {
+        fabCar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-                if(isOpen){
-                    fabCar.startAnimation(fabClose);
-                    fabMoto.startAnimation(fabClose);
-                    fabCar.setVisibility(View.INVISIBLE);
-                    fabMoto.setVisibility(View.INVISIBLE);
-                    isOpen = false;
-                } else {
-                    fabCar.startAnimation(fabOpen);
-                    fabMoto.startAnimation(fabOpen);
-                    fabCar.setVisibility(View.VISIBLE);
-                    fabMoto.setVisibility(View.VISIBLE);
-                    isOpen = true;
-                }
+                Toast.makeText(MainActivity.this, "Carro!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        fabMoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Moto!", Toast.LENGTH_LONG).show();
+
             }
         });
     }
@@ -88,11 +80,24 @@ public class MainActivity extends AppCompatActivity
         recyclerView = (RecyclerView) findViewById(R.id.rvRides);
         recyclerView.setHasFixedSize(true);
 
+        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    fab.hideMenuButton(true);
+                } else {
+                    fab.showMenuButton(true);
+                }
+            }
+        });
+
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
 
-        RideAdapter adapter = new RideAdapter(getRides(),this);
+        RideAdapter adapter = new RideAdapter(getRides(), this);
 
         recyclerView.setAdapter(adapter);
     }
@@ -117,7 +122,7 @@ public class MainActivity extends AppCompatActivity
         User passenger1, passenger2, passenger3, passenger4, passenger5;
         passenger1 = new User(7, null, "Adriana", "Silva", "Ilhéus", "N. Sra. da Vitória", null, "adriana.silva@email.com", "1234", R.drawable.ic_profile_placeholder);
         passenger2 = new User(8, null, "Paulo", "Machado", "Ilhéus", "Pontal", null, "paulo.machado@email.com", "1234", R.drawable.profile_circle4);
-        passenger3 = new User(8, null, "Bruno", "Azevedo", "Itabuna", "Centro", null, "bruno.azevedo@email.com", "1234", R.drawable.ic_profile_placeholder);
+        passenger3 = new User(9, null, "Bruno", "Azevedo", "Itabuna", "Centro", null, "bruno.azevedo@email.com", "1234", R.drawable.ic_profile_placeholder);
         passenger4 = new User(10, null, "Flávia", "Dias", "Itabuna", "São Pedro", null, "flavia.dias@email.com", "1234", R.drawable.profile_circle2);
         passenger5 = new User(11, null, "Lucas", "Freire", "Ilhéus", "Centro", null, "lucas.freire@email.com", "1234", R.drawable.ic_profile_placeholder);
 
@@ -156,6 +161,8 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (fab.isOpened()) {
+            fab.close(true);
         } else {
             super.onBackPressed();
         }
