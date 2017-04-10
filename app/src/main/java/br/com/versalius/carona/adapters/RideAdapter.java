@@ -3,6 +3,7 @@ package br.com.versalius.carona.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import br.com.versalius.carona.R;
+import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
 import br.com.versalius.carona.models.Ride;
 import br.com.versalius.carona.models.Vehicle;
 import br.com.versalius.carona.utils.PreferencesHelper;
@@ -28,6 +30,7 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
     private List<Ride> list;
     private LayoutInflater inflater;
     private Context context;
+    private RecycleViewOnItemClickListener listener;
 
     public RideAdapter(List<Ride> list, Context context) {
         this.list = list;
@@ -62,12 +65,14 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
         if (list.get(position).getAvailableSits() == 0) {
             holder.btGetRide.setEnabled(false);
             holder.btGetRide.setText("Cheia");
-            holder.btGetRide.setBackgroundColor(Color.GRAY);
+//            holder.btGetRide.setBackgroundColor(Color.GRAY);
+            holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
         }
 
         if (isInRide(list.get(position).getId())) {
             holder.btGetRide.setText("Sair");
-            holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary));
+//            holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary));
+            holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorSecondary));
         }
 
         holder.btGetRide.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +80,8 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
             public void onClick(View view) {
                 if (PreferencesHelper.getInstance(context).load("currentRideId").isEmpty()) {
                     holder.btGetRide.setText("Sair");
-                    holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary));
+//                    holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary));
+                    holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorSecondary));
                     try {
                         PreferencesHelper.getInstance(context).save("currentRideId", String.valueOf(list.get(position).getId()));
                     } catch (Exception e) {
@@ -83,7 +89,9 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
                     }
                 } else if (isInRide(list.get(position).getId())) {
                     holder.btGetRide.setText("Entrar");
-                    holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorButton));
+//                    holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorButton));
+                    holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorButton));
+
                     try {
                         PreferencesHelper.getInstance(context).save("currentRideId", "");
                     } catch (Exception e) {
@@ -105,10 +113,18 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
         return list != null ? list.size() : 0;
     }
 
+    public void setOnItemClickListener(RecycleViewOnItemClickListener listener){
+        this.listener = listener;
+    }
+
+    public List<Ride> getDataset(){
+        return list;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView tvDriverName, tvOrigin, tvDestination, tvAvailableSits, tvTime;
-        public Button btGetRide;
+        public AppCompatButton btGetRide;
         public ImageView ivProfile;
 
         public ViewHolder(View itemView) {
@@ -118,7 +134,7 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
             tvDestination = (TextView) itemView.findViewById(R.id.tvDestination);
             tvAvailableSits = (TextView) itemView.findViewById(R.id.tvAvailableSits);
             tvTime = (TextView) itemView.findViewById(R.id.tvTime);
-            btGetRide = (Button) itemView.findViewById(R.id.btGetRide);
+            btGetRide = (AppCompatButton) itemView.findViewById(R.id.btGetRide);
             ivProfile = (ImageView) itemView.findViewById(R.id.ivProfile);
         }
     }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.versalius.carona.adapters.RideAdapter;
+import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
 import br.com.versalius.carona.models.Ride;
 import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.models.Vehicle;
@@ -98,6 +99,12 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(manager);
 
         RideAdapter adapter = new RideAdapter(getRides(), this);
+        adapter.setOnItemClickListener(new RecycleViewOnItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                Toast.makeText(MainActivity.this, "click: " + ((RideAdapter)recyclerView.getAdapter()).getDataset().get(position).getId(), Toast.LENGTH_LONG).show();
+            }
+        });
 
         recyclerView.setAdapter(adapter);
     }
