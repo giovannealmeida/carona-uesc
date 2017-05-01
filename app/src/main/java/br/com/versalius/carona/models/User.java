@@ -24,12 +24,22 @@ public class User implements Serializable{
     private List<Vehicle> vehicles;
     private String firstName;
     private String lastName;
+    private String phone;
+    private String whatsapp;
     private String city;
     private String neighborhood;
     private Calendar birthDate;
     private String email;
     private String password;
     private String photoUrl;
+
+    //Preferences
+    private boolean showEmail;
+    private boolean showBirthday;
+    private boolean showCity;
+    private boolean showNeighborhood;
+    private boolean showPhone;
+    private boolean showWhatsapp;
 
     public  User (JSONObject json) {
         try {
@@ -43,6 +53,8 @@ public class User implements Serializable{
             }
             this.firstName = json.optString("u_first_name","User");
             this.lastName = json.optString("u_last_name","");
+            this.phone = json.optString("u_phone","");
+            this.whatsapp = json.optString("u_whatsapp","");
             this.city = json.optString("u_city","");
             this.neighborhood = json.optString("u_neighborhood","");
             this.birthDate = Calendar.getInstance();
@@ -52,6 +64,15 @@ public class User implements Serializable{
             if(!json.isNull("u_pic_path")) {
                 this.photoUrl = NetworkHelper.DOMINIO + json.getString("u_pic_path");
             }
+
+            JSONObject prefs = json.getJSONObject("u_prefs");
+            this.showEmail = prefs.getBoolean("up_show_email");
+            this.showBirthday = prefs.getBoolean("up_show_birthday");
+            this.showCity = prefs.getBoolean("up_show_city");
+            this.showNeighborhood = prefs.getBoolean("up_show_neighborhood");
+            this.showPhone = prefs.getBoolean("up_show_phone");
+            this.showWhatsapp = prefs.getBoolean("up_show_whatsapp");
+
         } catch (JSONException e){
             e.printStackTrace();
         } catch (ParseException e) {
@@ -86,6 +107,14 @@ public class User implements Serializable{
         return lastName;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
     public String getCity() {
         return city;
     }
@@ -96,6 +125,11 @@ public class User implements Serializable{
 
     public Calendar getBirthDate() {
         return birthDate;
+    }
+
+    public String getFormattedBirthday(String format){
+        SimpleDateFormat s = new SimpleDateFormat(format);
+        return s.format(getBirthDate().getTime());
     }
 
     public String getEmail() {
@@ -112,5 +146,29 @@ public class User implements Serializable{
 
     public String getPhotoUrl() {
         return photoUrl;
+    }
+
+    public boolean isShowEmail() {
+        return showEmail;
+    }
+
+    public boolean isShowBirthday() {
+        return showBirthday;
+    }
+
+    public boolean isShowCity() {
+        return showCity;
+    }
+
+    public boolean isShowNeighborhood() {
+        return showNeighborhood;
+    }
+
+    public boolean isShowPhone() {
+        return showPhone;
+    }
+
+    public boolean isShowWhatsapp() {
+        return showWhatsapp;
     }
 }

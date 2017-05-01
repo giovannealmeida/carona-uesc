@@ -34,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -91,6 +90,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
 
     private MaterialDialog mMaterialDialog;
     private CircleImageView ivProfile;
+    private Calendar nowCalendar;
 
     private static final int ACTION_RESULT_GET_IMAGE = 1000;
     private static final int REQUEST_PERMISSION_CODE = 1001;
@@ -179,7 +179,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
 
         /**** Seta o comportamento do DatePicker ****/
         final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-        Calendar nowCalendar = Calendar.getInstance();
+        nowCalendar = Calendar.getInstance();
         final DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
 
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -222,7 +222,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
                                 try {
                                     progressHelper.dismiss();
                                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
-                                    if(jsonObject.getBoolean("status")){
+                                    if (jsonObject.getBoolean("status")) {
                                         CustomSnackBar.make(coordinatorLayout, "Cadastro realizado com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
                                         finish();
                                     } else {
@@ -303,6 +303,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
                 isFocusRequested = true;
             }
         } else {
+            final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            etBirthday.setText(dateFormatter.format(nowCalendar.getTime()));
             formData.put("birth_date", etBirthday.getText().toString());
         }
 
@@ -345,7 +347,9 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
                 isFocusRequested = true;
             }
         } else {
-            formData.put("phone", etPhone.getText().toString());
+            if (!TextUtils.isEmpty(etPhone.getText())) {
+                formData.put("phone", etPhone.getText().toString());
+            }
         }
 
         if (!hasValidWhatsapp()) {
@@ -354,7 +358,9 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
                 isFocusRequested = true;
             }
         } else {
-            formData.put("whatsapp", etWhatsapp.getText().toString());
+            if (!TextUtils.isEmpty(etWhatsapp.getText())) {
+                formData.put("whatsapp", etWhatsapp.getText().toString());
+            }
         }
 
         /* Se ninguém pediu foco então tá tudo em ordem */
@@ -367,7 +373,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
 
         //O telefone não é obrigatório. Se não estiver vazio, verifica se é válido
         if (!TextUtils.isEmpty(phone)) {
-            if (((phone.length() < 13) || (phoneNumber.length < 2))||
+            if (((phone.length() < 13) || (phoneNumber.length < 2)) ||
                     ((phoneNumber[1].length() != 4) || ((phoneNumber[0].length() != 8) && (phoneNumber[0].length() != 9)))) {
                 tilPhone.setError(getResources().getString(R.string.err_msg_invalid_phone));
                 return false;
@@ -383,7 +389,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
 
         //O Whatsapp não é obrigatório. Se não estiver vazio, verifica se é válido
         if (!TextUtils.isEmpty(phone)) {
-            if (((phone.length() < 13) || (phoneNumber.length < 2))||
+            if (((phone.length() < 13) || (phoneNumber.length < 2)) ||
                     ((phoneNumber[1].length() != 4) || ((phoneNumber[0].length() != 8) && (phoneNumber[0].length() != 9)))) {
                 tilWhatsapp.setError(getResources().getString(R.string.err_msg_invalid_whatsapp));
                 return false;
@@ -518,7 +524,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
         return true;
     }
 
-    private boolean hasValidBirthDay(){
+    private boolean hasValidBirthDay() {
         return !TextUtils.isEmpty(etBirthday.getText().toString().trim());
     }
 

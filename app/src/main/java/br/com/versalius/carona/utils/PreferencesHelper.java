@@ -15,10 +15,22 @@ public class PreferencesHelper {
     public static final String USER_PREFERENCES = "br.com.versalius.carona";
 
     //Nome das chaves
-    static final String USER_FIRST_NAME = "user_first_name";
-    static final String USER_LAST_NAME = "user_last_name";
-    static final String USER_ID = "user_id";
-    static final String USER_EMAIL = "user_email";
+    public static final String USER_FIRST_NAME = "user_first_name";
+    public static final String USER_LAST_NAME = "user_last_name";
+    public static final String USER_ID = "user_id";
+    public static final String USER_EMAIL = "user_email";
+    public static final String USER_CITY = "user_city";
+    public static final String USER_NEIGHBORHOOD = "user_neighborhood";
+    public static final String USER_BIRTHDAY = "user_birthday";
+    public static final String USER_PHONE = "user_phone";
+    public static final String USER_WHATSAPP = "user_whatsapp";
+
+    public static final String PREF_SHOW_EMAIL = "show_email";
+    public static final String PREF_SHOW_BIRTHDAY = "show_birthday";
+    public static final String PREF_SHOW_CITY = "show_city";
+    public static final String PREF_SHOW_NEIGHBORHOOD = "show_neighborhood";
+    public static final String PREF_SHOW_PHONE = "show_phone";
+    public static final String PREF_SHOW_WHATSAPP = "show_whatsapp";
 
     private static PreferencesHelper instance;
     private SharedPreferences sharedPreferences;

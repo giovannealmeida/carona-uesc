@@ -54,6 +54,7 @@ import br.com.versalius.carona.R;
 import br.com.versalius.carona.network.NetworkHelper;
 import br.com.versalius.carona.network.ResponseCallback;
 import br.com.versalius.carona.utils.CustomSnackBar;
+import br.com.versalius.carona.utils.PreferencesHelper;
 import br.com.versalius.carona.utils.ProgressDialogHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -136,12 +137,19 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
 
         /* Instanciando campos */
         etFirstName = (EditText) findViewById(R.id.etFirstName);
+        etFirstName.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_FIRST_NAME));
         etLastName = (EditText) findViewById(R.id.etLastName);
+        etLastName.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_LAST_NAME));
         etCity = (EditText) findViewById(R.id.etCity);
+        etCity.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_CITY));
         etNeighborhood = (EditText) findViewById(R.id.etNeighborhood);
+        etNeighborhood.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_NEIGHBORHOOD));
         etBirthday = (EditText) findViewById(R.id.etBirthday);
+        etBirthday.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_BIRTHDAY));
         etPhone = (EditText) findViewById(R.id.etPhone);
+        etPhone.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_PHONE));
         etWhatsapp = (EditText) findViewById(R.id.etWhatsapp);
+        etWhatsapp.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_WHATSAPP));
 
         /* Adicionando FocusListener*/
         etFirstName.setOnFocusChangeListener(this);

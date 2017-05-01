@@ -98,6 +98,18 @@ public class SessionHelper {
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_LAST_NAME, user.getLastName());
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_ID, user.getId());
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_EMAIL, user.getEmail());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_CITY, user.getCity());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_NEIGHBORHOOD, user.getNeighborhood());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_BIRTHDAY, user.getFormattedBirthday("dd/MM/yyyy"));
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_PHONE, user.getPhone());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_WHATSAPP, user.getWhatsapp());
+
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.PREF_SHOW_EMAIL, user.isShowEmail());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.PREF_SHOW_BIRTHDAY, user.isShowBirthday());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.PREF_SHOW_CITY, user.isShowCity());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.PREF_SHOW_NEIGHBORHOOD, user.isShowNeighborhood());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.PREF_SHOW_PHONE, user.isShowPhone());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.PREF_SHOW_WHATSAPP, user.isShowWhatsapp());
 
         } catch (Exception e) {
             e.printStackTrace();
