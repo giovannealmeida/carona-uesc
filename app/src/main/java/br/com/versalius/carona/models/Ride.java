@@ -1,8 +1,16 @@
 package br.com.versalius.carona.models;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Giovanne on 03/12/2016.
@@ -11,30 +19,48 @@ import java.util.List;
 public class Ride implements Serializable {
 
     //    Ride status
-    public static final int RIDE_OPEN = 0;
-    public static final int RIDE_CLOSED = 1;
-    public static final int RIDE_FULL = 2;
+    //A carona está aberta e os passageiros podem solicitar entrada.
+    public static final int RIDE_OPEN = 1;
+    //A carona já foi fechada pelo motorista e está prestes a iniciar. Não é possível mais entrar nesta carona.
+    public static final int RIDE_CLOSED = 2;
+    //A carona está em andamento e os passageiros estão sendo transportados.
+    public static final int RIDE_RUNNING = 3;
+    //A carona terminou. Todos os passageiros já foram deixados em seus destinos.
+    public static final int RIDE_FINISHED = 4;
+    //O motorista cancelou a carona. Todos os passageiros foram removidos da carona.
+    public static final int RIDE_CANCELED = 5;
+    //A carona atingiu o número máximo de passageiros. Não há mais acento disponível.
+    public static final int RIDE_FULL = 6;
 
     private int id;
     private User driver;
     private List<User> passengers;
     private int status;
-    private int availableSits; /* driver.getVehicle().getNumSits() - passengers.size() */
-    private String origin;
+    private Origin origin;
     private String destinationCity;
     private String destinationNeighborhood;
     private Calendar departTime;
 
-    public Ride(int id, User driver, List<User> passengers, int status, int availableSits, String origin, String destinationCity, String destinationNeighborhood, Calendar departTime) {
-        this.id = id;
-        this.driver = driver;
-        this.passengers = passengers;
-        this.status = status;
-        this.availableSits = availableSits;
-        this.origin = origin;
-        this.destinationCity = destinationCity;
-        this.destinationNeighborhood = destinationNeighborhood;
-        this.departTime = departTime;
+    public Ride(JSONObject json) {
+        try {
+            this.id = json.getInt("r_id");
+            this.driver = new User(json.getJSONObject("r_driver"));
+            if (!json.isNull("r_passengers")) {
+                JSONArray passengers = json.getJSONArray("r_passengers");
+                this.passengers = new ArrayList<>();
+                for (int i = 0; i < passengers.length(); i++) {
+                    this.passengers.add(new User(passengers.getJSONObject(i)));
+                }
+            }
+            this.status = json.getInt("r_status_id");
+            this.origin = new Origin(json.getJSONObject("r_origin"));
+            this.destinationCity = json.getString("r_destination_city");
+            this.destinationNeighborhood = json.getString("r_destination_neighborhood");
+            this.departTime = Calendar.getInstance();
+            this.departTime.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).parse(json.optString("r_depart_time", "")));
+        } catch (JSONException | ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getId() {
@@ -54,12 +80,12 @@ public class Ride implements Serializable {
     }
 
     public int getAvailableSits() {
-        int numPassengers = getPassengers() == null?0:getPassengers().size();
+        int numPassengers = getPassengers() == null ? 0 : getPassengers().size();
         return getDriver().getActiveCar().getNumSits() - numPassengers;
     }
 
     public String getOrigin() {
-        return origin;
+        return origin.getName();
     }
 
     public String getDestinationCity() {
@@ -75,8 +101,8 @@ public class Ride implements Serializable {
     }
 
     public String getDepartTimeString() {
-//        return getDepartTime().toString();
-        return "18:00";
+        SimpleDateFormat s = new SimpleDateFormat("HH:mm");
+        return s.format(getDepartTime().getTime());
     }
 
     public String getFullDestination() {

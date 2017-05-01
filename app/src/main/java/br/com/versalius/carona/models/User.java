@@ -29,8 +29,6 @@ public class User implements Serializable{
     private Calendar birthDate;
     private String email;
     private String password;
-//    private CustomFile photo;
-    private int photoRes;
     private String photoUrl;
 
     public  User (JSONObject json) {
@@ -49,26 +47,14 @@ public class User implements Serializable{
             this.birthDate.setTime(new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(json.optString("u_birth_date","")));
             this.email = json.optString("email","");
             this.password = json.optString("password","");
-            this.photoUrl = NetworkHelper.DOMINIO+json.getString("u_pic_path");
+            if(!json.isNull("u_pic_path")) {
+                this.photoUrl = NetworkHelper.DOMINIO + json.getString("u_pic_path");
+            }
         } catch (JSONException e){
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
         }
-    }
-
-    public User(int id, Vehicle vehicle, String firstName, String lastName, String city, String neighborhood, Calendar birthDate, String email, String password, int photoRes) {
-        this.id = id;
-        this.vehicles = new ArrayList<>();
-        this.vehicles.add(vehicle);
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.city = city;
-        this.neighborhood = neighborhood;
-        this.birthDate = birthDate;
-        this.email = email;
-        this.password = password;
-        this.photoRes = photoRes;
     }
 
     public Vehicle getActiveCar(){
@@ -114,10 +100,6 @@ public class User implements Serializable{
 
     public String getPassword() {
         return password;
-    }
-
-    public int getPhotoRes() {
-        return photoRes;
     }
 
     public String getFullName() {

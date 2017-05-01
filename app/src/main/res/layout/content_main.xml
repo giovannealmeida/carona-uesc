@@ -13,5 +13,13 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvRides"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/emptyView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Não existem caronas"
+        android:textSize="40sp"
+        android:visibility="gone" />
 </RelativeLayout>

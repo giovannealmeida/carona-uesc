@@ -59,34 +59,13 @@
             fab:fab_size="mini" />
 
     </com.github.clans.fab.FloatingActionMenu>
-    <!--<android.support.design.widget.FloatingActionButton-->
-    <!--android:id="@+id/fabMoto"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="bottom|end"-->
-    <!--android:layout_marginBottom="150dp"-->
-    <!--android:layout_marginRight="@dimen/fab_margin"-->
-    <!--android:layout_marginEnd="@dimen/fab_margin"-->
-    <!--android:src="@drawable/ic_moto_white"-->
-    <!--android:visibility="invisible" />-->
-
-    <!--<android.support.design.widget.FloatingActionButton-->
-    <!--android:id="@+id/fabCar"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="bottom|end"-->
-    <!--android:layout_marginBottom="90dp"-->
-    <!--android:layout_marginRight="@dimen/fab_margin"-->
-    <!--android:layout_marginEnd="@dimen/fab_margin"-->
-    <!--android:src="@drawable/ic_car_white"-->
-    <!--android:visibility="invisible" />-->
-
-    <!--<android.support.design.widget.FloatingActionButton-->
-    <!--android:id="@+id/fab"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="bottom|end"-->
-    <!--android:layout_margin="@dimen/fab_margin"-->
-    <!--android:src="@drawable/ic_car_add" />-->
+    <ProgressBar
+        android:id="@+id/login_progress"
+        android:layout_gravity="center"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"/>
 
 </android.support.design.widget.CoordinatorLayout>

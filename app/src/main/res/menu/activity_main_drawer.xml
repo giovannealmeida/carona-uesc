@@ -4,6 +4,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_available_rides"
+            android:checked="true"
             android:icon="@drawable/ic_thumb"
             android:title="@string/item_menu_available_rides" />
         <item

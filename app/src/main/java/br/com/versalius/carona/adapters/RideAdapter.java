@@ -13,6 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
+
 import java.util.List;
 
 import br.com.versalius.carona.R;
@@ -61,7 +64,9 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
         holder.tvDestination.setText(list.get(position).getFullDestination());
         holder.tvDestination.setSelected(true);
 
-        holder.ivProfile.setImageResource(list.get(position).getDriver().getPhotoRes());
+        if(list.get(position).getDriver().getPhotoUrl() != null) {
+            holder.ivProfile.setImageURI(list.get(position).getDriver().getPhotoUrl());
+        }
         if (list.get(position).getAvailableSits() == 0) {
             holder.btGetRide.setEnabled(false);
             holder.btGetRide.setText("Cheia");
@@ -121,11 +126,11 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
         return list;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public TextView tvDriverName, tvOrigin, tvDestination, tvAvailableSits, tvTime;
         public AppCompatButton btGetRide;
-        public ImageView ivProfile;
+        public SimpleDraweeView ivProfile;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -135,7 +140,19 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
             tvAvailableSits = (TextView) itemView.findViewById(R.id.tvAvailableSits);
             tvTime = (TextView) itemView.findViewById(R.id.tvTime);
             btGetRide = (AppCompatButton) itemView.findViewById(R.id.btGetRide);
-            ivProfile = (ImageView) itemView.findViewById(R.id.ivProfile);
+            ivProfile = (SimpleDraweeView) itemView.findViewById(R.id.ivProfile);
+            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+            roundingParams.setRoundAsCircle(true);
+            ivProfile.getHierarchy().setRoundingParams(roundingParams);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(listener != null){
+                listener.onItemClick(v,getAdapterPosition());
+            }
         }
     }
 }

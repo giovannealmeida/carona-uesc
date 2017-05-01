@@ -1,6 +1,5 @@
 package br.com.versalius.carona;
 
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -17,11 +16,16 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +35,15 @@ import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
 import br.com.versalius.carona.models.Ride;
 import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.models.Vehicle;
+import br.com.versalius.carona.network.NetworkHelper;
+import br.com.versalius.carona.network.ResponseCallback;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recyclerView;
     private FloatingActionMenu fab;
+    private TextView emptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +53,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getResources().getString(R.string.item_menu_available_rides));
         setSupportActionBar(toolbar);
+        emptyView = (TextView) findViewById(R.id.emptyView);
 
         setUpFabs();
 
@@ -68,10 +76,10 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //Seta o header
-        //Nome
+        //Nome do usuário
         View navHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
         ((TextView) navHeader.findViewById(R.id.tvUsername)).setText(user.getFullName());
-        //Foto
+        //Foto do usuário
         Uri uri = Uri.parse(user.getPhotoUrl());
         SimpleDraweeView draweeView = (SimpleDraweeView) navHeader.findViewById(R.id.ivProfile);
         draweeView.setImageURI(uri);
@@ -80,9 +88,10 @@ public class MainActivity extends AppCompatActivity
         draweeView.getHierarchy().setRoundingParams(roundingParams);
         TextView tvCurrentVehicle = (TextView) navHeader.findViewById(R.id.tvCurrentVehicle);
         Vehicle vehicle = user.getActiveCar();
-        tvCurrentVehicle.setText(vehicle.getBrand()+" - "+ vehicle.getModel());
-        if(vehicle.getType()==Vehicle.VEHICLE_TYPE_MOTO){
-            tvCurrentVehicle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_moto_white,0,0,0);
+        //Marca e modelo do carro
+        tvCurrentVehicle.setText(vehicle.getBrand() + " - " + vehicle.getModel());
+        if (vehicle.getType() == Vehicle.VEHICLE_TYPE_MOTO) {
+            tvCurrentVehicle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_moto_white, 0, 0, 0);
         }
     }
 
@@ -130,70 +139,98 @@ public class MainActivity extends AppCompatActivity
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
 
-        RideAdapter adapter = new RideAdapter(getRides(), this);
-        adapter.setOnItemClickListener(new RecycleViewOnItemClickListener() {
+        NetworkHelper.getInstance(this).getRides(Ride.RIDE_OPEN, new ResponseCallback() {
             @Override
-            public void onItemClick(View v, int position) {
-                Toast.makeText(MainActivity.this, "click: " + ((RideAdapter) recyclerView.getAdapter()).getDataset().get(position).getId(), Toast.LENGTH_LONG).show();
+            public void onSuccess(String jsonStringResponse) {
+                try {
+                    JSONObject jsonObject = new JSONObject(jsonStringResponse);
+                    if (jsonObject.getBoolean("status")) {
+                        JSONArray jsonRides = jsonObject.getJSONArray("data");
+                        List<Ride> rides = new ArrayList<>();
+                        for (int i = 0; i < jsonRides.length(); i++) {
+                            rides.add(new Ride(jsonRides.getJSONObject(i)));
+                        }
+
+                        RideAdapter adapter = new RideAdapter(rides, MainActivity.this);
+                        adapter.setOnItemClickListener(new RecycleViewOnItemClickListener() {
+                            @Override
+                            public void onItemClick(View v, int position) {
+                                Toast.makeText(MainActivity.this, "click: " + ((RideAdapter) recyclerView.getAdapter()).getDataset().get(position).getId(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                        recyclerView.setAdapter(adapter);
+                    } else { //Não existem caronas
+                        emptyView.setText(jsonObject.getString("message"));
+                        emptyView.setVisibility(View.VISIBLE);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFail(VolleyError error) {
+                emptyView.setText("Não foi possível carregar as caronas. Tente novamente mais tarde.");
+                emptyView.setVisibility(View.VISIBLE);
             }
         });
 
-        recyclerView.setAdapter(adapter);
     }
 
-    private List<Ride> getRides() {
-        Vehicle car1, car2, car3, car4, car5, moto;
-        car1 = new Vehicle(1, Vehicle.VEHICLE_TYPE_CAR, "Volkswagen", "Fusca", false, 2, 3, "ABC-1234", "Vermelho", "#FF0000", null, null);
-        car2 = new Vehicle(2, Vehicle.VEHICLE_TYPE_CAR, "Volkswagen", "CrossFox", true, 4, 4, "DEF-5687", "Branco", "#FFFFFF", null, null);
-        car3 = new Vehicle(3, Vehicle.VEHICLE_TYPE_CAR, "FIAT", "Uno", false, 4, 2, "DEF-5687", "Preto", "#000000", null, null);
-        car4 = new Vehicle(4, Vehicle.VEHICLE_TYPE_CAR, "Chevrolet", "Cobalt", true, 4, 4, "DEF-5687", "Laranja", "#FF5000", null, null);
-        car5 = new Vehicle(5, Vehicle.VEHICLE_TYPE_CAR, "Mitsibushi", "Pajero", true, 4, 1, "DEF-5687", "Amarelo", "#FFFF00", null, null);
-        moto = new Vehicle(6, Vehicle.VEHICLE_TYPE_MOTO, "Honda", "Pop 100", false, 0, 1, "DEF-5687", "Azul", "#0000FF", null, null);
-
-        User driver1, driver2, driver3, driver4, driver5, driver6;
-        driver1 = new User(1, car1, "Jorge", "Andrade", "Ilhéus", "N. Sra. da Vitória", null, "carlos.andrade@email.com", "1234", R.drawable.profile_circle3);
-        driver2 = new User(2, car2, "Paula", "Cardoso", "Itabuna", "São Caetano", null, "paula.cardoso@email.com", "1234", R.drawable.ic_profile_placeholder);
-        driver3 = new User(3, car3, "Alessandra", "Borges", "Itabuna", "Sarinha", null, "alessandra.broges@email.com", "1234", R.drawable.profile_circle);
-        driver4 = new User(4, car4, "Carine", "Jade", "Ilhéus", "Centro", null, "carine.jade@email.com", "1234", R.drawable.ic_profile_placeholder);
-        driver5 = new User(5, car5, "Juliana", "Britto", "Ilhéus", "Pacheco", null, "juliana.britto@email.com", "1234", R.drawable.profile_circle5);
-        driver6 = new User(6, moto, "Matheus", "Almeida", "Ilhéus", "Olivença", null, "metheus.almeida@email.com", "1234", R.drawable.ic_profile_placeholder);
-
-        User passenger1, passenger2, passenger3, passenger4, passenger5;
-        passenger1 = new User(7, null, "Adriana", "Silva", "Ilhéus", "N. Sra. da Vitória", null, "adriana.silva@email.com", "1234", R.drawable.ic_profile_placeholder);
-        passenger2 = new User(8, null, "Paulo", "Machado", "Ilhéus", "Pontal", null, "paulo.machado@email.com", "1234", R.drawable.profile_circle4);
-        passenger3 = new User(9, null, "Bruno", "Azevedo", "Itabuna", "Centro", null, "bruno.azevedo@email.com", "1234", R.drawable.ic_profile_placeholder);
-        passenger4 = new User(10, null, "Flávia", "Dias", "Itabuna", "São Pedro", null, "flavia.dias@email.com", "1234", R.drawable.profile_circle2);
-        passenger5 = new User(11, null, "Lucas", "Freire", "Ilhéus", "Centro", null, "lucas.freire@email.com", "1234", R.drawable.ic_profile_placeholder);
-
-        List<User> passengers1, passengers2;
-        passengers1 = new ArrayList<>();
-        passengers2 = new ArrayList<>();
-
-        passengers1.add(passenger1);
-        passengers1.add(passenger2);
-        passengers1.add(passenger3);
-
-        passengers2.add(passenger4);
-        passengers2.add(passenger5);
-
-        Ride ride1, ride2, ride3, ride4, ride5, ride6;
-        ride1 = new Ride(1, driver1, passengers1, Ride.RIDE_OPEN, 0, "Guarita", "Ilhéus", "N. Sra. da Vitória", null);
-        ride2 = new Ride(2, driver2, null, Ride.RIDE_OPEN, 0, "Pav. Jorge Amado", "Ilhéus", "Pacheco", null);
-        ride3 = new Ride(3, driver3, null, Ride.RIDE_OPEN, 0, "Guarita", "Itabuna", "Sarinha", null);
-        ride4 = new Ride(4, driver4, passengers2, Ride.RIDE_OPEN, 0, "Biblioteca", "Itabuna", "Centro", null);
-        ride5 = new Ride(5, driver5, null, Ride.RIDE_OPEN, 0, "Pav. Jorge Amado", "Itabuna", "Pontalzinho", null);
-        ride6 = new Ride(6, driver6, null, Ride.RIDE_OPEN, 0, "Pav. Max de Menezes", "Ilhéus", "Centro", null);
-
-        List<Ride> rides = new ArrayList<>();
-        rides.add(ride1);
-        rides.add(ride2);
-        rides.add(ride3);
-        rides.add(ride4);
-        rides.add(ride5);
-        rides.add(ride6);
-
-        return rides;
-    }
+//    private List<Ride> getRides() {
+//        Vehicle car1, car2, car3, car4, car5, moto;
+//        car1 = new Vehicle(1, Vehicle.VEHICLE_TYPE_CAR, "Volkswagen", "Fusca", false, 2, 3, "ABC-1234", "Vermelho", "#FF0000", null, null);
+//        car2 = new Vehicle(2, Vehicle.VEHICLE_TYPE_CAR, "Volkswagen", "CrossFox", true, 4, 4, "DEF-5687", "Branco", "#FFFFFF", null, null);
+//        car3 = new Vehicle(3, Vehicle.VEHICLE_TYPE_CAR, "FIAT", "Uno", false, 4, 2, "DEF-5687", "Preto", "#000000", null, null);
+//        car4 = new Vehicle(4, Vehicle.VEHICLE_TYPE_CAR, "Chevrolet", "Cobalt", true, 4, 4, "DEF-5687", "Laranja", "#FF5000", null, null);
+//        car5 = new Vehicle(5, Vehicle.VEHICLE_TYPE_CAR, "Mitsibushi", "Pajero", true, 4, 1, "DEF-5687", "Amarelo", "#FFFF00", null, null);
+//        moto = new Vehicle(6, Vehicle.VEHICLE_TYPE_MOTO, "Honda", "Pop 100", false, 0, 1, "DEF-5687", "Azul", "#0000FF", null, null);
+//
+//        User driver1, driver2, driver3, driver4, driver5, driver6;
+//        driver1 = new User(1, car1, "Jorge", "Andrade", "Ilhéus", "N. Sra. da Vitória", null, "carlos.andrade@email.com", "1234", R.drawable.profile_circle3);
+//        driver2 = new User(2, car2, "Paula", "Cardoso", "Itabuna", "São Caetano", null, "paula.cardoso@email.com", "1234", R.drawable.ic_profile_placeholder);
+//        driver3 = new User(3, car3, "Alessandra", "Borges", "Itabuna", "Sarinha", null, "alessandra.broges@email.com", "1234", R.drawable.profile_circle);
+//        driver4 = new User(4, car4, "Carine", "Jade", "Ilhéus", "Centro", null, "carine.jade@email.com", "1234", R.drawable.ic_profile_placeholder);
+//        driver5 = new User(5, car5, "Juliana", "Britto", "Ilhéus", "Pacheco", null, "juliana.britto@email.com", "1234", R.drawable.profile_circle5);
+//        driver6 = new User(6, moto, "Matheus", "Almeida", "Ilhéus", "Olivença", null, "metheus.almeida@email.com", "1234", R.drawable.ic_profile_placeholder);
+//
+//        User passenger1, passenger2, passenger3, passenger4, passenger5;
+//        passenger1 = new User(7, null, "Adriana", "Silva", "Ilhéus", "N. Sra. da Vitória", null, "adriana.silva@email.com", "1234", R.drawable.ic_profile_placeholder);
+//        passenger2 = new User(8, null, "Paulo", "Machado", "Ilhéus", "Pontal", null, "paulo.machado@email.com", "1234", R.drawable.profile_circle4);
+//        passenger3 = new User(9, null, "Bruno", "Azevedo", "Itabuna", "Centro", null, "bruno.azevedo@email.com", "1234", R.drawable.ic_profile_placeholder);
+//        passenger4 = new User(10, null, "Flávia", "Dias", "Itabuna", "São Pedro", null, "flavia.dias@email.com", "1234", R.drawable.profile_circle2);
+//        passenger5 = new User(11, null, "Lucas", "Freire", "Ilhéus", "Centro", null, "lucas.freire@email.com", "1234", R.drawable.ic_profile_placeholder);
+//
+//        List<User> passengers1, passengers2;
+//        passengers1 = new ArrayList<>();
+//        passengers2 = new ArrayList<>();
+//
+//        passengers1.add(passenger1);
+//        passengers1.add(passenger2);
+//        passengers1.add(passenger3);
+//
+//        passengers2.add(passenger4);
+//        passengers2.add(passenger5);
+//
+//        Ride ride1, ride2, ride3, ride4, ride5, ride6;
+//        ride1 = new Ride(1, driver1, passengers1, Ride.RIDE_OPEN, 0, "Guarita", "Ilhéus", "N. Sra. da Vitória", null);
+//        ride2 = new Ride(2, driver2, null, Ride.RIDE_OPEN, 0, "Pav. Jorge Amado", "Ilhéus", "Pacheco", null);
+//        ride3 = new Ride(3, driver3, null, Ride.RIDE_OPEN, 0, "Guarita", "Itabuna", "Sarinha", null);
+//        ride4 = new Ride(4, driver4, passengers2, Ride.RIDE_OPEN, 0, "Biblioteca", "Itabuna", "Centro", null);
+//        ride5 = new Ride(5, driver5, null, Ride.RIDE_OPEN, 0, "Pav. Jorge Amado", "Itabuna", "Pontalzinho", null);
+//        ride6 = new Ride(6, driver6, null, Ride.RIDE_OPEN, 0, "Pav. Max de Menezes", "Ilhéus", "Centro", null);
+//
+//        List<Ride> rides = new ArrayList<>();
+//        rides.add(ride1);
+//        rides.add(ride2);
+//        rides.add(ride3);
+//        rides.add(ride4);
+//        rides.add(ride5);
+//        rides.add(ride6);
+//
+//        return rides;
+//    }
 
     @Override
     public void onBackPressed() {
