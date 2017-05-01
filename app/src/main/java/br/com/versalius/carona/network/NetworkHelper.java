@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -27,14 +28,12 @@ public class NetworkHelper {
     private static Context context;
     private RequestQueue requestQueue;
 
-    //private final String DOMINIO = "http://devakijob.versalius.com.br/api"; // Remoto
-    private final String DOMINIO = "http://192.168.56.1/caronauesc-web/api"; // Repo
-
-    private final String LOGIN = "/user_service/login";
-    private final String SIGNUP = "/login_controller/register";
-    private final String CHECK_EMAIL = "/user_controller/email_check";
-    private final String SEND_SURVEY = "/survey";
-    private final String CITY = "/city_controller";
+//    private final String DOMINIO = "http://giog.000webhostapp.com/"; // Remoto
+    public static final String DOMINIO = "http://10.1.1.106/caronauesc-web/"; // Repo
+    private final String API = "api/";
+    private final String LOGIN = API+"UserService/login";
+    private final String SIGNUP = API+"login_controller/register";
+    private final String CHECK_EMAIL = API+"user_controller/email_check";
 
     private NetworkHelper(Context context) {
         this.context = context;
@@ -63,17 +62,6 @@ public class NetworkHelper {
         params.put("email", email);
         params.put("password", EncryptHelper.SHA1(password));
         execute(Request.Method.POST, params, TAG, DOMINIO + LOGIN, callback);
-    }
-
-    public void getCities(long stateId, ResponseCallback callback) {
-        HashMap<String, String> params = new HashMap<>();
-        params.put("state_id", String.valueOf(stateId));
-
-        execute(Request.Method.GET,
-                null, //GET não precisa de parâmetro no corpo
-                TAG,
-                buildGetURL(DOMINIO + CITY, params),
-                callback);
     }
 
     public void doSignUp(HashMap<String, String> params, ResponseCallback callback) {
@@ -134,8 +122,13 @@ public class NetworkHelper {
                     }
                 });
 
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                30000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         request.setTag(tag);
         getRequestQueue().add(request);
+
     }
 
     private String buildGetURL(String url, HashMap<String, String> params) {

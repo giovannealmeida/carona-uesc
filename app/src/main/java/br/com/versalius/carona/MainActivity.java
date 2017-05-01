@@ -1,5 +1,7 @@
 package br.com.versalius.carona;
 
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,8 +14,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.generic.RoundingParams;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -35,12 +41,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fresco.initialize(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getResources().getString(R.string.item_menu_available_rides));
         setSupportActionBar(toolbar);
 
         setUpFabs();
+
+        setUpDrawer(toolbar);
+
+        setUpRecycleView();
+    }
+
+    private void setUpDrawer(Toolbar toolbar) {
+        //Recupera usuário
+        User user = (User) getIntent().getExtras().getSerializable("user");
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -51,7 +67,17 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        setUpRecycleView();
+        //Seta o header
+        //Nome
+        View navHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        ((TextView) navHeader.findViewById(R.id.tvUsername)).setText(user.getFullName());
+        //Foto
+        Uri uri = Uri.parse(user.getPhotoUrl());
+        SimpleDraweeView draweeView = (SimpleDraweeView) navHeader.findViewById(R.id.ivProfile);
+        draweeView.setImageURI(uri);
+        RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+        roundingParams.setRoundAsCircle(true);
+        draweeView.getHierarchy().setRoundingParams(roundingParams);
     }
 
     private void setUpFabs() {
@@ -102,7 +128,7 @@ public class MainActivity extends AppCompatActivity
         adapter.setOnItemClickListener(new RecycleViewOnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-                Toast.makeText(MainActivity.this, "click: " + ((RideAdapter)recyclerView.getAdapter()).getDataset().get(position).getId(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "click: " + ((RideAdapter) recyclerView.getAdapter()).getDataset().get(position).getId(), Toast.LENGTH_LONG).show();
             }
         });
 

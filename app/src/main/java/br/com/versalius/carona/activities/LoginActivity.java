@@ -3,16 +3,16 @@ package br.com.versalius.carona.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import br.com.versalius.carona.MainActivity;
 import br.com.versalius.carona.R;
+import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.network.NetworkHelper;
 import br.com.versalius.carona.network.ResponseCallback;
 
@@ -34,17 +35,20 @@ import br.com.versalius.carona.network.ResponseCallback;
 public class LoginActivity extends AppCompatActivity {
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
+    private EditText mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private TextView tvMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        tvMessage = (TextView) findViewById(R.id.tvMessage);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (EditText) findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -58,10 +62,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        AppCompatButton btLogin = (AppCompatButton) findViewById(R.id.btLogin);
+        btLogin.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                tvMessage.setText("");
                 attemptLogin();
             }
         });
@@ -89,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -113,21 +118,20 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
+            toggleProgress(true);
             NetworkHelper.getInstance(this).doLogin(mEmailView.getText().toString(), mPasswordView.getText().toString(), new ResponseCallback() {
                 @Override
                 public void onSuccess(String jsonStringResponse) {
-                    JSONArray jArray = null;
                     try {
-                        showProgress(false);
+                        toggleProgress(false);
                         JSONObject jsonObject = new JSONObject(jsonStringResponse);
                         if(jsonObject.getBoolean("status")){
-                            //CustomSnackBar.make(coordinatorLayout, "Cadastro realizado com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
-                            Toast.makeText(LoginActivity.this,"Login realizado",Toast.LENGTH_LONG).show();
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("user",new User(jsonObject.getJSONObject("data")));
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class).putExtras(bundle));
                             finish();
                         } else {
-                            //CustomSnackBar.make(coordinatorLayout, "Falha ao realizar cadastro", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
-                            Toast.makeText(LoginActivity.this,"Usuário ou senha incorretos",Toast.LENGTH_LONG).show();
+                            tvMessage.setText(jsonObject.getString("message"));
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -136,7 +140,12 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onFail(VolleyError error) {
-                    Toast.makeText(LoginActivity.this, "Ocorreu um erro. Tente novamente mais tarde.", Toast.LENGTH_LONG).show();
+                    toggleProgress(false);
+                    if(!NetworkHelper.isOnline(getApplicationContext())){
+                        tvMessage.setText("Você está offline!");
+                    } else {
+                        tvMessage.setText("Falha ao tentar se conectar. Tente mais tarde.");
+                    }
                 }
             });
         }
@@ -156,7 +165,7 @@ public class LoginActivity extends AppCompatActivity {
      * Shows the progress UI and hides the login form.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
+    private void toggleProgress(final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.

@@ -61,7 +61,7 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
         holder.tvDestination.setText(list.get(position).getFullDestination());
         holder.tvDestination.setSelected(true);
 
-        holder.ivProfile.setImageResource(list.get(position).getDriver().getPhoto());
+        holder.ivProfile.setImageResource(list.get(position).getDriver().getPhotoRes());
         if (list.get(position).getAvailableSits() == 0) {
             holder.btGetRide.setEnabled(false);
             holder.btGetRide.setText("Cheia");
