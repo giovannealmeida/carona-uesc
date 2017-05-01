@@ -37,4 +37,46 @@
     <string name="dialog_action_yes">Sim</string>
     <string name="dialog_action_cancel">Cancelar</string>
     <string name="dialog_message_logout">Tem certeza que deseja sair?</string>
+    <string name="dialog_title_permission">Permissão requerida</string>
+    <string name="dialog_permission_agree_button">Aceitar</string>
+    <string name="dialog_permission_disagree_button">Negar</string>
+
+    <!--Hints-->
+    <string name="hint_first_name">Nome</string>
+    <string name="hint_last_name">Sobrenome</string>
+    <string name="hint_email_required">E-mail*</string>
+    <string name="hint_password_required">Senha*</string>
+    <string name="hint_password_again">Repita a senha</string>
+    <string name="hint_birth_date">Data de nascimento</string>
+    <string name="lb_gender">Sexo</string>
+    <string name="err_msg_must_select_one">Selecione uma opção</string>
+    <string name="lb_radio_male">Masculino</string>
+    <string name="lb_radio_female">Feminino</string>
+    <string name="hint_city">Cidade</string>
+    <string name="hint_phone">Telefone</string>
+    <string name="hint_whatsapp">Whatsapp</string>
+    <string name="hint_singup">Cadastrar!</string>
+    <string name="hint_neigborhood">Bairro</string>
+    <string name="title_signup">Cadastro</string>
+
+    <!--Errors-->
+    <string name="err_msg_empty_name">Insira um nome</string>
+    <string name="err_msg_empty_last_name">Insira um sobrenome</string>
+    <string name="err_msg_short_name">O nome deve conter 2 caracteres ou mais</string>
+    <string name="err_msg_short_last_name">O sobrenome deve conter 2 caracteres ou mais</string>
+    <string name="err_msg_empty_city">Insira uma cidade</string>
+    <string name="err_msg_short_city">A cidade deve conter 4 caracteres ou mais</string>
+    <string name="err_msg_short_neighborhood">O bairro deve conter 4 caratedes ou mais</string>
+    <string name="err_msg_empty_neighborhood">Insira um bairro</string>
+    <string name="err_msg_invalid_phone">Telefone inválido</string>
+    <string name="err_msg_invalid_whatsapp">Número de Whatsapp inválido</string>
+    <string name="err_msg_dont_match_password">As senhas não são iguais</string>
+    <string name="err_msg_short_password">A senha deve conter de 6 a 22 caracteres</string>
+    <string name="err_msg_empty_email">Insira um e-mail</string>
+    <string name="err_msg_invalid_email">E-mail inválido</string>
+    <string name="err_msg_existing_email">Este e-mail já está cadastrado</string>
+    <string name="err_msg_server_fail">Falha ao verificar e-mail. Tente mais tarde.</string>
+    <string name="title_activity_crop">Cortar imagem</string>
+    <string name="title_activity_signup">Cadastro</string>
+
 </resources>

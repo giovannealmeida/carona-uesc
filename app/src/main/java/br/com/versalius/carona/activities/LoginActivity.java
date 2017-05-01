@@ -49,6 +49,15 @@ public class LoginActivity extends AppCompatActivity {
         if(getIntent().getStringExtra("message")!= null) {
             tvMessage.setText(getIntent().getStringExtra("message"));
         }
+
+        TextView tvSignup = (TextView) findViewById(R.id.tvSignUp);
+        tvSignup.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this,SignupActivity.class));
+            }
+        });
+
         // Set up the login form.
         mEmailView = (EditText) findViewById(R.id.email);
 
@@ -137,6 +146,7 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
                         } else {
                             tvMessage.setText(jsonObject.getString("message"));
+                            toggleProgress(false);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

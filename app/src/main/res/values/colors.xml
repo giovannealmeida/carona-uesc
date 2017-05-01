@@ -4,6 +4,13 @@
     <color name="colorPrimaryDark">#c25000</color>
     <color name="colorSecondary">#ff5050</color>
     <color name="colorAccent">#5cb85c</color>
+    <color name="colorAccentLight">#a5d6a7</color>
 
     <color name="colorButton">#2196f3</color>
+    <color name="err_msg">#D50000</color>
+
+    <!--SnackBar-->
+    <color name="snackBackgroundError">#992222</color>
+    <color name="snackBackgroundSuccess">#48AA48</color>
+    <color name="snackBackgroundInfo">#555</color>
 </resources>
