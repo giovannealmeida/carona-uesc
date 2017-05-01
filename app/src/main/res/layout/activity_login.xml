@@ -64,6 +64,7 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@android:drawable/ic_lock_idle_lock"
                     android:hint="@string/prompt_password"
+                    android:text="123456"
                     android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"

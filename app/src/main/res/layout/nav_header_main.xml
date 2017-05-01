@@ -35,7 +35,10 @@
 
     <TextView
         android:id="@+id/tvCurrentVehicle"
-        android:layout_width="wrap_content"
+        android:text="Carro"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/ic_car_white"
         android:textColor="@android:color/white" />

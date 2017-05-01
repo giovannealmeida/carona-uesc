@@ -55,7 +55,7 @@ public class Ride implements Serializable {
 
     public int getAvailableSits() {
         int numPassengers = getPassengers() == null?0:getPassengers().size();
-        return getDriver().getVehicle().getNumSits() - numPassengers;
+        return getDriver().getActiveCar().getNumSits() - numPassengers;
     }
 
     public String getOrigin() {

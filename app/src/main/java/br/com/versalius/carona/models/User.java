@@ -1,12 +1,15 @@
 package br.com.versalius.carona.models;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import br.com.versalius.carona.network.NetworkHelper;
@@ -18,7 +21,7 @@ import br.com.versalius.carona.network.NetworkHelper;
 public class User implements Serializable{
 
     private int id;
-    private Vehicle vehicle;
+    private List<Vehicle> vehicles;
     private String firstName;
     private String lastName;
     private String city;
@@ -33,7 +36,11 @@ public class User implements Serializable{
     public  User (JSONObject json) {
         try {
             this.id = json.getInt("u_id");
-            //this.vehicle = new Vehicle(json.getJSONObject("vehicle"));
+            JSONArray vehicles = json.getJSONArray("u_vehicles");
+            this.vehicles = new ArrayList<>();
+            for(int i=0;i<vehicles.length();i++){
+                this.vehicles.add(new Vehicle(vehicles.getJSONObject(i)));
+            }
             this.firstName = json.optString("u_first_name","User");
             this.lastName = json.optString("u_last_name","");
             this.city = json.optString("u_city","");
@@ -52,7 +59,8 @@ public class User implements Serializable{
 
     public User(int id, Vehicle vehicle, String firstName, String lastName, String city, String neighborhood, Calendar birthDate, String email, String password, int photoRes) {
         this.id = id;
-        this.vehicle = vehicle;
+        this.vehicles = new ArrayList<>();
+        this.vehicles.add(vehicle);
         this.firstName = firstName;
         this.lastName = lastName;
         this.city = city;
@@ -63,12 +71,21 @@ public class User implements Serializable{
         this.photoRes = photoRes;
     }
 
+    public Vehicle getActiveCar(){
+        for(Vehicle vehicle : vehicles){
+            if(vehicle.isDefault()){
+                return vehicle;
+            }
+        }
+        return null;
+    }
+
     public int getId() {
         return id;
     }
 
-    public Vehicle getVehicle() {
-        return vehicle;
+    public List<Vehicle> getVehicles() {
+        return vehicles;
     }
 
     public String getFirstName() {
@@ -109,9 +126,5 @@ public class User implements Serializable{
 
     public String getPhotoUrl() {
         return photoUrl;
-    }
-
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
     }
 }

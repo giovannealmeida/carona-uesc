@@ -15,8 +15,8 @@ import br.com.versalius.carona.utils.CustomFile;
 public class Vehicle implements Serializable {
 
 //    Vehicle types
-    public static final int VEHICLE_TYPE_CAR = 0;
-    public static final int VEHICLE_TYPE_MOTO = 1;
+    public static final int VEHICLE_TYPE_CAR = 1;
+    public static final int VEHICLE_TYPE_MOTO = 2;
 
     private long id;
     private int type;
@@ -30,19 +30,25 @@ public class Vehicle implements Serializable {
     private String colorCode; /*HEX code for the color*/
     private CustomFile mainPhoto;
     private List<CustomFile> galery;
+    private boolean isDefault;
 
     public Vehicle(JSONObject json) {
         try {
-            this.id = json.getInt("id");
-            this.type = json.getInt("type");
-            this.brand = json.getString("brand");
-            this.model = json.getString("model");
-            this.air = json.getBoolean("air");
-            this.numDoors = json.getInt("num_doors");
-            this.numSits = json.getInt("num_sits");
-            this.plate = json.getString("plate");
-            this.colorName = json.getString("colorName_name");
-            this.colorCode = json.getString("colorName_code");
+            this.id = json.getInt("v_id");
+            this.type = json.getInt("v_vehicle_type");
+            this.brand = json.getString("v_brand");
+            this.model = json.getString("v_model");
+            if(json.getInt("v_air") == 1){
+                this.air = true;
+            }
+            this.numDoors = json.getInt("v_num_doors");
+            this.numSits = json.getInt("v_num_sit");
+            this.plate = json.getString("v_plate");
+            this.colorName = json.getString("v_color_name");
+            this.colorCode = json.getString("v_color_hex");
+            if(json.getInt("v_default") == 1){
+                this.isDefault = true;
+            }
 //            TODO: pegar as imagens
         } catch (JSONException e) {
             e.printStackTrace();
@@ -62,6 +68,7 @@ public class Vehicle implements Serializable {
         this.colorCode = colorCode;
         this.mainPhoto = mainPhoto;
         this.galery = galery;
+        this.isDefault = true;
     }
 
     public long getId() {
@@ -110,5 +117,9 @@ public class Vehicle implements Serializable {
 
     public List<CustomFile> getGalery() {
         return galery;
+    }
+
+    public Boolean isDefault() {
+        return isDefault;
     }
 }

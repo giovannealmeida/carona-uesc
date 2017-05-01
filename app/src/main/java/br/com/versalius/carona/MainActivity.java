@@ -78,6 +78,12 @@ public class MainActivity extends AppCompatActivity
         RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
         roundingParams.setRoundAsCircle(true);
         draweeView.getHierarchy().setRoundingParams(roundingParams);
+        TextView tvCurrentVehicle = (TextView) navHeader.findViewById(R.id.tvCurrentVehicle);
+        Vehicle vehicle = user.getActiveCar();
+        tvCurrentVehicle.setText(vehicle.getBrand()+" - "+ vehicle.getModel());
+        if(vehicle.getType()==Vehicle.VEHICLE_TYPE_MOTO){
+            tvCurrentVehicle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_moto_white,0,0,0);
+        }
     }
 
     private void setUpFabs() {

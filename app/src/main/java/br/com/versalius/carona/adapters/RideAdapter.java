@@ -51,7 +51,7 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
 
         holder.tvTime.setText(list.get(position).getDepartTimeString());
         holder.tvAvailableSits.setText(String.valueOf(list.get(position).getAvailableSits()));
-        if(list.get(position).getDriver().getVehicle().getType() == Vehicle.VEHICLE_TYPE_MOTO){
+        if(list.get(position).getDriver().getActiveCar().getType() == Vehicle.VEHICLE_TYPE_MOTO){
             holder.tvAvailableSits.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_moto_black),null,null,null);
         }
 
