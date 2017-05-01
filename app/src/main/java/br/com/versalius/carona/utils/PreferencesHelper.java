@@ -15,17 +15,15 @@ public class PreferencesHelper {
     public static final String USER_PREFERENCES = "br.com.versalius.carona";
 
     //Nome das chaves
-    public static final String USER_FIRST_NAME = "user_first_name";
-    public static final String USER_LAST_NAME = "user_last_name";
-    public static final String USER_PASSWORD = "user_password";
-    public static final String USER_ID = "user_id";
+    static final String USER_FIRST_NAME = "user_first_name";
+    static final String USER_LAST_NAME = "user_last_name";
+    static final String USER_ID = "user_id";
+    static final String USER_EMAIL = "user_email";
 
     private static PreferencesHelper instance;
     private SharedPreferences sharedPreferences;
-    private Context context;
 
     private PreferencesHelper(Context context) {
-        this.context = context;
         this.sharedPreferences = context.getSharedPreferences(USER_PREFERENCES, Context.MODE_PRIVATE);
     }
 

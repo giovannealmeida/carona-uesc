@@ -35,6 +35,7 @@ public class NetworkHelper {
     private final String SIGNUP = API+"login_controller/register";
     private final String CHECK_EMAIL = API+"user_controller/email_check";
     private final String GET_RIDES = API+"RideService/get_by_status";
+    private final String GET_USER = API+"UserService/get_user_by_id";
 
     private NetworkHelper(Context context) {
         this.context = context;
@@ -99,13 +100,23 @@ public class NetworkHelper {
                 callback);
     }
 
-    public void getRides(int status, ResponseCallback callback) {
+    public void getRidesByStatus(int status, ResponseCallback callback) {
         HashMap<String, String> params = new HashMap<>();
         params.put("status", Integer.toString(status));
         execute(Request.Method.GET,
                 null,
                 TAG,
                 buildGetURL(DOMINIO + GET_RIDES,params),
+                callback);
+    }
+
+    public void getUserById(String id, ResponseCallback callback) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("id", id);
+        execute(Request.Method.GET,
+                null,
+                TAG,
+                buildGetURL(DOMINIO + GET_USER,params),
                 callback);
     }
 

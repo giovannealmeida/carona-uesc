@@ -4,7 +4,10 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <!--Toolbar menu-->
+    <string name="action_logout">Sair</string>
+
+    <!--Drawer menu-->
     <string name="item_menu_available_rides">Caronas disponíveis</string>
     <string name="item_menu_my_profile">Meu perfil</string>
     <string name="item_menu_my_ride">Minha carona</string>
@@ -29,4 +32,9 @@
     <string name="forgot_password">Esqueceu sua senha?</string>
     <string name="dont_you_have_an_account">Não possui conta?</string>
     <string name="sign_up">Cadastre-se</string>
+
+    <!--Dialogs-->
+    <string name="dialog_action_yes">Sim</string>
+    <string name="dialog_action_cancel">Cancelar</string>
+    <string name="dialog_message_logout">Tem certeza que deseja sair?</string>
 </resources>

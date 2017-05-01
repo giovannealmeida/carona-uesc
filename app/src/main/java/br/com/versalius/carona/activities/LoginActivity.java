@@ -15,11 +15,9 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,6 +26,7 @@ import br.com.versalius.carona.R;
 import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.network.NetworkHelper;
 import br.com.versalius.carona.network.ResponseCallback;
+import br.com.versalius.carona.utils.SessionHelper;
 
 /**
  * A login screen that offers login via email/password.
@@ -45,8 +44,11 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         tvMessage = (TextView) findViewById(R.id.tvMessage);
+
+        if(getIntent().getStringExtra("message")!= null) {
+            tvMessage.setText(getIntent().getStringExtra("message"));
+        }
         // Set up the login form.
         mEmailView = (EditText) findViewById(R.id.email);
 
@@ -123,11 +125,14 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(String jsonStringResponse) {
                     try {
-                        toggleProgress(false);
                         JSONObject jsonObject = new JSONObject(jsonStringResponse);
                         if(jsonObject.getBoolean("status")){
+                            User user = new User(jsonObject.getJSONObject("data"));
                             Bundle bundle = new Bundle();
-                            bundle.putSerializable("user",new User(jsonObject.getJSONObject("data")));
+                            bundle.putSerializable("user",user);
+
+                            new SessionHelper(LoginActivity.this).saveUser(user);
+
                             startActivity(new Intent(LoginActivity.this, MainActivity.class).putExtras(bundle));
                             finish();
                         } else {
