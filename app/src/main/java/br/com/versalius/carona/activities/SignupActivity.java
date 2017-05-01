@@ -634,49 +634,49 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
     public void afterTextChanged(Editable s) {
         String lastChar = "";
 
-        int digits = etPhone.getText().toString().length();
+        int digits = s.toString().length();
                 /* Se não está apagando, verifica se algo precisa ser adicionado */
         if (!isErasing) {
             if (digits > 0) {
-                lastChar = etPhone.getText().toString().substring(digits - 1);
+                lastChar = s.toString().substring(digits - 1);
             }
             switch (digits) {
                 case 1:
-                    String digit = etPhone.getText().toString();
-                    etPhone.setText("");
-                    etPhone.append("(" + digit);
+                    String digit = s.toString();
+                    s.clear();
+                    s.append("(" + digit);
                     break;
                 case 3:
-                    etPhone.append(")");
+                    s.append(")");
                     break;
                         /* Quando o ")" é apagado */
                 case 4:
                     if (!lastChar.equals(")")) {
-                        String currentDigits = etPhone.getText().toString().substring(0, digits - 1);
-                        etPhone.setText("");
-                        etPhone.append(currentDigits + ")" + lastChar);
+                        String currentDigits = s.toString().substring(0, digits - 1);
+                        s.clear();
+                        s.append(currentDigits + ")" + lastChar);
                     }
                     break;
                         /* Assumindo números no formatp (99)9999-9999*/
                 case 8:
-                    etPhone.append("-");
+                    s.append("-");
                     break;
                         /* Quando o "-" é apagado */
                 case 9:
                     if (!lastChar.equals("-")) {
-                        String currentDigits = etPhone.getText().toString().substring(0, digits - 1);
-                        etPhone.setText("");
-                        etPhone.append(currentDigits + "-" + lastChar);
+                        String currentDigits = s.toString().substring(0, digits - 1);
+                        s.clear();
+                        s.append(currentDigits + "-" + lastChar);
                     }
                     break;
                         /* Assumindo números no formatp (99)99999-9999*/
                 case 14:
                     try {
-                        String currentDigits[] = etPhone.getText().toString().split("-");
+                        String currentDigits[] = s.toString().split("-");
                         if (currentDigits[0].length() == 8) {
                             currentDigits[1] = new StringBuilder(currentDigits[1]).insert(1, "-").toString();
-                            etPhone.setText("");
-                            etPhone.append(currentDigits[0] + currentDigits[1]);
+                            s.clear();
+                            s.append(currentDigits[0] + currentDigits[1]);
                         }
                     } catch (Exception e) {
                         //TODO: Lançar exceção
@@ -686,11 +686,11 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
         } else { /* Se apagou o último dígito deixando o número no formato (99)9999-9999 */
             if (digits == 13) {
                 try {
-                    String currentDigits[] = etPhone.getText().toString().split("-");
+                    String currentDigits[] = s.toString().split("-");
                     if (currentDigits[1].length() == 3) {
                         currentDigits[0] = new StringBuilder(currentDigits[0]).insert(currentDigits[0].length() - 1, "-").toString();
-                        etPhone.setText("");
-                        etPhone.append(currentDigits[0] + currentDigits[1]);
+                        s.clear();
+                        s.append(currentDigits[0] + currentDigits[1]);
                     }
                 } catch (Exception e) {
                     //TODO: Lançar exceção
