@@ -78,5 +78,6 @@
     <string name="err_msg_server_fail">Falha ao verificar e-mail. Tente mais tarde.</string>
     <string name="title_activity_crop">Cortar imagem</string>
     <string name="title_activity_signup">Cadastro</string>
+    <string name="lb_passenger">Passageiro</string>
 
 </resources>

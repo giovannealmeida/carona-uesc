@@ -34,10 +34,12 @@ public class User implements Serializable{
     public  User (JSONObject json) {
         try {
             this.id = json.getInt("u_id");
-            JSONArray vehicles = json.getJSONArray("u_vehicles");
-            this.vehicles = new ArrayList<>();
-            for(int i=0;i<vehicles.length();i++){
-                this.vehicles.add(new Vehicle(vehicles.getJSONObject(i)));
+            if(!json.isNull("u_vehicles")) {
+                JSONArray vehicles = json.getJSONArray("u_vehicles");
+                this.vehicles = new ArrayList<>();
+                for (int i = 0; i < vehicles.length(); i++) {
+                    this.vehicles.add(new Vehicle(vehicles.getJSONObject(i)));
+                }
             }
             this.firstName = json.optString("u_first_name","User");
             this.lastName = json.optString("u_last_name","");
@@ -58,9 +60,11 @@ public class User implements Serializable{
     }
 
     public Vehicle getActiveCar(){
-        for(Vehicle vehicle : vehicles){
-            if(vehicle.isDefault()){
-                return vehicle;
+        if(vehicles != null) {
+            for (Vehicle vehicle : vehicles) {
+                if (vehicle.isDefault()) {
+                    return vehicle;
+                }
             }
         }
         return null;

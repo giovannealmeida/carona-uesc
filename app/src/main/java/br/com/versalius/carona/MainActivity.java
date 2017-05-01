@@ -96,10 +96,16 @@ public class MainActivity extends AppCompatActivity
         draweeView.getHierarchy().setRoundingParams(roundingParams);
         TextView tvCurrentVehicle = (TextView) navHeader.findViewById(R.id.tvCurrentVehicle);
         Vehicle vehicle = user.getActiveCar();
-        //Marca e modelo do carro
-        tvCurrentVehicle.setText(vehicle.getBrand() + " - " + vehicle.getModel());
-        if (vehicle.getType() == Vehicle.VEHICLE_TYPE_MOTO) {
-            tvCurrentVehicle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_moto_white, 0, 0, 0);
+        if(vehicle != null) {
+            //Marca e modelo do carro
+            tvCurrentVehicle.setText(vehicle.getBrand() + " - " + vehicle.getModel());
+            if (vehicle.getType() == Vehicle.VEHICLE_TYPE_MOTO) {
+                tvCurrentVehicle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_moto_white, 0, 0, 0);
+            } else {
+                tvCurrentVehicle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_car_white, 0, 0, 0);
+            }
+        } else {
+            tvCurrentVehicle.setText(getResources().getString(R.string.lb_passenger));
         }
     }
 

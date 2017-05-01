@@ -178,7 +178,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
         rbFemale = (RadioButton) findViewById(R.id.rbFemale);
 
         /**** Seta o comportamento do DatePicker ****/
-        final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MMM/yyyy", Locale.US);
+        final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
         Calendar nowCalendar = Calendar.getInstance();
         final DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
 
@@ -215,30 +215,30 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
                 final ProgressDialogHelper progressHelper = new ProgressDialogHelper(SignupActivity.this);
                 if (NetworkHelper.isOnline(SignupActivity.this)) {
                     if (isValidForm()) {
-//                        progressHelper.createProgressSpinner("Aguarde", "Realizando cadastro", true, false);
-//                        NetworkHelper.getInstance(SignupActivity.this).doSignUp(formData, new ResponseCallback() {
-//                            @Override
-//                            public void onSuccess(String jsonStringResponse) {
-//                                try {
-//                                    progressHelper.dismiss();
-//                                    JSONObject jsonObject = new JSONObject(jsonStringResponse);
-//                                    if(jsonObject.getBoolean("status")){
-//                                        CustomSnackBar.make(coordinatorLayout, "Cadastro realizado com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
-//                                        finish();
-//                                    } else {
-//                                        CustomSnackBar.make(coordinatorLayout, "Falha ao realizar cadastro", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
-//                                    }
-//                                } catch (JSONException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onFail(VolleyError error) {
-//                                progressHelper.dismiss();
-//                                CustomSnackBar.make(coordinatorLayout, "Falha ao realizar cadastro", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
-//                            }
-//                        });
+                        progressHelper.createProgressSpinner("Aguarde", "Realizando cadastro", true, false);
+                        NetworkHelper.getInstance(SignupActivity.this).doSignUp(formData, new ResponseCallback() {
+                            @Override
+                            public void onSuccess(String jsonStringResponse) {
+                                try {
+                                    progressHelper.dismiss();
+                                    JSONObject jsonObject = new JSONObject(jsonStringResponse);
+                                    if(jsonObject.getBoolean("status")){
+                                        CustomSnackBar.make(coordinatorLayout, "Cadastro realizado com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
+                                        finish();
+                                    } else {
+                                        CustomSnackBar.make(coordinatorLayout, "Falha ao realizar cadastro", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFail(VolleyError error) {
+                                progressHelper.dismiss();
+                                CustomSnackBar.make(coordinatorLayout, "Falha ao realizar cadastro", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
+                            }
+                        });
                     }
                 } else {
                     CustomSnackBar.make(coordinatorLayout, "Você está offline", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
@@ -294,6 +294,16 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
             }
         } else {
             formData.put("password", etPassword.getText().toString());
+        }
+
+        /* Verifica a data de nascimento*/
+        if (!hasValidBirthDay()) {
+            if (!isFocusRequested) {
+                etBirthday.requestFocus();
+                isFocusRequested = true;
+            }
+        } else {
+            formData.put("birth_date", etBirthday.getText().toString());
         }
 
         /* Verifica os campos de cidade e bairro*/
@@ -504,8 +514,12 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
             tilNeighborhood.setError(getResources().getString(R.string.err_msg_short_neighborhood));
             return false;
         }
-        tilCity.setErrorEnabled(false);
+        tilNeighborhood.setErrorEnabled(false);
         return true;
+    }
+
+    private boolean hasValidBirthDay(){
+        return !TextUtils.isEmpty(etBirthday.getText().toString().trim());
     }
 
     /**
@@ -608,7 +622,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] imageBytes = baos.toByteArray();
-        formData.put("avatar", Base64.encodeToString(imageBytes, Base64.DEFAULT));
+        formData.put("image", Base64.encodeToString(imageBytes, Base64.DEFAULT));
     }
 
     @Override

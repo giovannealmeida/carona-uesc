@@ -32,7 +32,7 @@ public class NetworkHelper {
     public static final String DOMINIO = "http://10.1.1.108/caronauesc-web/"; // Repo
     private final String API = "api/";
     private final String LOGIN = API+"UserService/login";
-    private final String SIGNUP = API+"login_controller/register";
+    private final String SIGNUP = API+"UserService/signup";
     private final String CHECK_EMAIL = API+"UserService/email_check";
     private final String GET_RIDES = API+"RideService/get_by_status";
     private final String GET_USER = API+"UserService/get_user_by_id";
