@@ -18,6 +18,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -38,6 +39,7 @@ import android.widget.RadioGroup;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.VolleyError;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -79,12 +81,20 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
     private RadioButton rbMale;
     private RadioButton rbFemale;
 
+    private SwitchCompat swShowBirthday;
+    private SwitchCompat swShowEmail;
+    private SwitchCompat swShowCity;
+    private SwitchCompat swShowNeighborhood;
+    private SwitchCompat swShowPhone;
+    private SwitchCompat swShowWhatsapp;
+
     private CoordinatorLayout coordinatorLayout;
 
     private HashMap<String, String> formData;
 
     private MaterialDialog mMaterialDialog;
     private CircleImageView ivProfile;
+    private SimpleDraweeView ivUrlProfile;
 
     private static final int ACTION_RESULT_GET_IMAGE = 1000;
     private static final int REQUEST_PERMISSION_CODE = 1001;
@@ -104,7 +114,17 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
     }
 
     private void setUpViews() {
+        PreferencesHelper pref = PreferencesHelper.getInstance(this);
+
         ivProfile = (CircleImageView) findViewById(R.id.ivProfile);
+        ivUrlProfile = (SimpleDraweeView)  findViewById(R.id.ivUrlProfile);
+        Uri uri = Uri.parse(pref.load(PreferencesHelper.USER_IMAGE_URL));
+        if(!uri.toString().isEmpty() && !uri.toString().equals("null")) {
+            ivUrlProfile.setImageURI(uri);
+        } else {
+            ivUrlProfile.setVisibility(View.GONE);
+            ivProfile.setVisibility(View.VISIBLE);
+        }
         /* Pegar imagem */
         ImageButton btGetImage = (ImageButton) findViewById(R.id.btGetImage);
         btGetImage.setOnClickListener(new View.OnClickListener() {
@@ -134,22 +154,47 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         tilPhone = (TextInputLayout) findViewById(R.id.tilPhone);
         tilWhatsapp = (TextInputLayout) findViewById(R.id.tilWhatsapp);
 
-
         /* Instanciando campos */
         etFirstName = (EditText) findViewById(R.id.etFirstName);
-        etFirstName.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_FIRST_NAME));
+        etFirstName.setText(pref.load(PreferencesHelper.USER_FIRST_NAME));
         etLastName = (EditText) findViewById(R.id.etLastName);
-        etLastName.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_LAST_NAME));
+        etLastName.setText(pref.load(PreferencesHelper.USER_LAST_NAME));
         etCity = (EditText) findViewById(R.id.etCity);
-        etCity.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_CITY));
+        etCity.setText(pref.load(PreferencesHelper.USER_CITY));
         etNeighborhood = (EditText) findViewById(R.id.etNeighborhood);
-        etNeighborhood.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_NEIGHBORHOOD));
+        etNeighborhood.setText(pref.load(PreferencesHelper.USER_NEIGHBORHOOD));
         etBirthday = (EditText) findViewById(R.id.etBirthday);
-        etBirthday.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_BIRTHDAY));
+        etBirthday.setText(pref.load(PreferencesHelper.USER_BIRTHDAY));
         etPhone = (EditText) findViewById(R.id.etPhone);
-        etPhone.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_PHONE));
+        etPhone.setText(pref.load(PreferencesHelper.USER_PHONE));
         etWhatsapp = (EditText) findViewById(R.id.etWhatsapp);
-        etWhatsapp.setText(PreferencesHelper.getInstance(this).load(PreferencesHelper.USER_WHATSAPP));
+        etWhatsapp.setText(pref.load(PreferencesHelper.USER_WHATSAPP));
+
+        /* Instanciando switches */
+        swShowBirthday = (SwitchCompat) findViewById(R.id.swShowBirthday);
+        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_BIRTHDAY))){
+            swShowBirthday.setChecked(true);
+        }
+        swShowEmail = (SwitchCompat) findViewById(R.id.swShowEmail);
+        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_EMAIL))){
+            swShowEmail.setChecked(true);
+        }
+        swShowCity = (SwitchCompat) findViewById(R.id.swShowCity);
+        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_CITY))){
+            swShowCity.setChecked(true);
+        }
+        swShowNeighborhood = (SwitchCompat) findViewById(R.id.swShowNeighborhood);
+        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_NEIGHBORHOOD))){
+            swShowNeighborhood.setChecked(true);
+        }
+        swShowPhone = (SwitchCompat) findViewById(R.id.swShowPhone);
+        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_PHONE))){
+            swShowPhone.setChecked(true);
+        }
+        swShowWhatsapp = (SwitchCompat) findViewById(R.id.swShowWhatsapp);
+        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_WHATSAPP))){
+            swShowWhatsapp.setChecked(true);
+        }
 
         /* Adicionando FocusListener*/
         etFirstName.setOnFocusChangeListener(this);
@@ -504,6 +549,8 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
     public void onEvent(Bitmap bitmap) {
         /* Preview da imagem */
         ivProfile.setImageBitmap(bitmap);
+        ivProfile.setVisibility(View.VISIBLE);
+        ivUrlProfile.setVisibility(View.GONE);
 
         /* Codifica a imagem pra envio */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

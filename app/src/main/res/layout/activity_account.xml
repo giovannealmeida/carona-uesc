@@ -36,8 +36,15 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="10dp"
                     android:src="@drawable/ic_profile_placeholder"
+                    android:visibility="gone"
                     app:civ_border_color="#FF000000"
                     app:civ_border_width="2dp" />
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/ivUrlProfile"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    app:placeholderImage="@drawable/ic_profile_placeholder" />
 
                 <ImageButton
                     android:id="@+id/btGetImage"
@@ -78,6 +85,24 @@
                     android:hint="@string/hint_last_name"
                     android:inputType="textCapWords" />
             </android.support.design.widget.TextInputLayout>
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/swShowEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:text="Exibir e-mail"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:textSize="18sp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginTop="4dp"
+                android:text="E-mail" />
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/swShowBirthday"
@@ -191,8 +216,8 @@
                 android:id="@+id/swShowPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="4dp"
                 android:layout_marginTop="8dp"
+                android:padding="4dp"
                 android:text="Exibir telefone"
                 android:textSize="20sp" />
 
@@ -216,8 +241,8 @@
                 android:id="@+id/swShowWhatsapp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="4dp"
                 android:layout_marginTop="8dp"
+                android:padding="4dp"
                 android:text="Exibir Whatsapp"
                 android:textSize="20sp" />
 

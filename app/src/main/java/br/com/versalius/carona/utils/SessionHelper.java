@@ -97,6 +97,7 @@ public class SessionHelper {
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_FIRST_NAME, user.getFirstName());
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_LAST_NAME, user.getLastName());
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_ID, user.getId());
+            PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_IMAGE_URL, user.getPhotoUrl());
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_EMAIL, user.getEmail());
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_CITY, user.getCity());
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_NEIGHBORHOOD, user.getNeighborhood());

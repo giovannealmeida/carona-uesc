@@ -18,6 +18,7 @@ public class PreferencesHelper {
     public static final String USER_FIRST_NAME = "user_first_name";
     public static final String USER_LAST_NAME = "user_last_name";
     public static final String USER_ID = "user_id";
+    public static final String USER_IMAGE_URL = "user_image_url";
     public static final String USER_EMAIL = "user_email";
     public static final String USER_CITY = "user_city";
     public static final String USER_NEIGHBORHOOD = "user_neighborhood";

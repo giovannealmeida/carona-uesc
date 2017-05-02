@@ -89,9 +89,11 @@ public class MainActivity extends AppCompatActivity
         View navHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
         ((TextView) navHeader.findViewById(R.id.tvUsername)).setText(user.getFullName());
         //Foto do usuário
-        Uri uri = Uri.parse(user.getPhotoUrl());
         SimpleDraweeView draweeView = (SimpleDraweeView) navHeader.findViewById(R.id.ivProfile);
-        draweeView.setImageURI(uri);
+        if(user.getPhotoUrl()!=null) {
+            Uri uri = Uri.parse(user.getPhotoUrl());
+            draweeView.setImageURI(uri);
+        }
         RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
         roundingParams.setRoundAsCircle(true);
         draweeView.getHierarchy().setRoundingParams(roundingParams);

@@ -24,8 +24,8 @@ public class User implements Serializable{
     private List<Vehicle> vehicles;
     private String firstName;
     private String lastName;
-    private String phone;
-    private String whatsapp;
+    private String phone = "";
+    private String whatsapp = "";
     private String city;
     private String neighborhood;
     private Calendar birthDate;
@@ -53,8 +53,15 @@ public class User implements Serializable{
             }
             this.firstName = json.optString("u_first_name","User");
             this.lastName = json.optString("u_last_name","");
-            this.phone = json.optString("u_phone","");
-            this.whatsapp = json.optString("u_whatsapp","");
+
+            if(!json.getString("u_phone").equals("null")) {
+                this.phone = json.optString("u_phone", "");
+            }
+
+            if(!json.getString("u_whatsapp").equals("null")) {
+                this.whatsapp = json.optString("u_whatsapp", "");
+            }
+
             this.city = json.optString("u_city","");
             this.neighborhood = json.optString("u_neighborhood","");
             this.birthDate = Calendar.getInstance();
@@ -66,12 +73,24 @@ public class User implements Serializable{
             }
 
             JSONObject prefs = json.getJSONObject("u_prefs");
-            this.showEmail = prefs.getBoolean("up_show_email");
-            this.showBirthday = prefs.getBoolean("up_show_birthday");
-            this.showCity = prefs.getBoolean("up_show_city");
-            this.showNeighborhood = prefs.getBoolean("up_show_neighborhood");
-            this.showPhone = prefs.getBoolean("up_show_phone");
-            this.showWhatsapp = prefs.getBoolean("up_show_whatsapp");
+            if(prefs.getInt("up_show_email") == 1) {
+                this.showEmail = true;
+            }
+            if(prefs.getInt("up_show_birthday") == 1) {
+                this.showBirthday = true;
+            }
+            if(prefs.getInt("up_show_city") == 1) {
+                this.showCity = true;
+            }
+            if(prefs.getInt("up_show_neighborhood") == 1) {
+                this.showNeighborhood = true;
+            }
+            if(prefs.getInt("up_show_phone") == 1) {
+                this.showPhone = true;
+            }
+            if(prefs.getInt("up_show_whatsapp") == 1) {
+                this.showWhatsapp = true;
+            }
 
         } catch (JSONException e){
             e.printStackTrace();
