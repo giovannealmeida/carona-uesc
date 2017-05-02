@@ -208,7 +208,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
             }
         });
 
-        Button btSingUp = (Button) findViewById(R.id.btSignup);
+        Button btSingUp = (Button) findViewById(R.id.btSave);
         btSingUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

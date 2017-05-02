@@ -33,6 +33,7 @@ public class NetworkHelper {
     private final String API = "api/";
     private final String LOGIN = API+"UserService/login";
     private final String SIGNUP = API+"UserService/signup";
+    private final String SAVE_PREFS = API+"UserService/save_prefs";
     private final String CHECK_EMAIL = API+"UserService/email_check";
     private final String GET_RIDES = API+"RideService/get_by_status";
     private final String GET_USER = API+"UserService/get_user_by_id";
@@ -71,6 +72,19 @@ public class NetworkHelper {
                 params,
                 TAG,
                 DOMINIO + SIGNUP,
+                callback);
+    }
+
+    /**
+     * Salva as preferêncuas de conta
+     * @param params - Dados a serem salvos
+     * @param callback - Callback de resposta do servidor
+     */
+    public void savePreferences(HashMap<String, String> params, ResponseCallback callback) {
+        execute(Request.Method.POST,
+                params,
+                TAG,
+                DOMINIO + SAVE_PREFS,
                 callback);
     }
 

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,21 +23,20 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
-import android.util.Patterns;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.VolleyError;
+import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -60,7 +58,7 @@ import br.com.versalius.carona.utils.PreferencesHelper;
 import br.com.versalius.carona.utils.ProgressDialogHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AccountActivity extends AppCompatActivity implements View.OnFocusChangeListener, TextWatcher {
+public class AccountActivity extends AppCompatActivity implements View.OnFocusChangeListener, TextWatcher, CompoundButton.OnCheckedChangeListener {
 
     private TextInputLayout tilFirstName;
     private TextInputLayout tilLastName;
@@ -116,11 +114,15 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
     private void setUpViews() {
         PreferencesHelper pref = PreferencesHelper.getInstance(this);
 
+        formData.put("user_id",pref.load(PreferencesHelper.USER_ID));
         ivProfile = (CircleImageView) findViewById(R.id.ivProfile);
         ivUrlProfile = (SimpleDraweeView)  findViewById(R.id.ivUrlProfile);
         Uri uri = Uri.parse(pref.load(PreferencesHelper.USER_IMAGE_URL));
         if(!uri.toString().isEmpty() && !uri.toString().equals("null")) {
             ivUrlProfile.setImageURI(uri);
+            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+            roundingParams.setRoundAsCircle(true);
+            ivUrlProfile.getHierarchy().setRoundingParams(roundingParams);
         } else {
             ivUrlProfile.setVisibility(View.GONE);
             ivProfile.setVisibility(View.VISIBLE);
@@ -172,28 +174,52 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
 
         /* Instanciando switches */
         swShowBirthday = (SwitchCompat) findViewById(R.id.swShowBirthday);
+        swShowBirthday.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_BIRTHDAY))){
             swShowBirthday.setChecked(true);
+            formData.put("show_birthday","1");
+        } else {
+            formData.put("show_birthday","0");
         }
         swShowEmail = (SwitchCompat) findViewById(R.id.swShowEmail);
+        swShowEmail.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_EMAIL))){
             swShowEmail.setChecked(true);
+            formData.put("show_email","1");
+        } else {
+            formData.put("show_email","0");
         }
         swShowCity = (SwitchCompat) findViewById(R.id.swShowCity);
+        swShowCity.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_CITY))){
             swShowCity.setChecked(true);
+            formData.put("show_city","1");
+        } else {
+            formData.put("show_city","0");
         }
         swShowNeighborhood = (SwitchCompat) findViewById(R.id.swShowNeighborhood);
+        swShowNeighborhood.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_NEIGHBORHOOD))){
             swShowNeighborhood.setChecked(true);
+            formData.put("show_neighborhood","1");
+        } else {
+            formData.put("show_neighborhood","0");
         }
         swShowPhone = (SwitchCompat) findViewById(R.id.swShowPhone);
+        swShowPhone.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_PHONE))){
             swShowPhone.setChecked(true);
+            formData.put("show_phone","1");
+        } else {
+            formData.put("show_phone","0");
         }
         swShowWhatsapp = (SwitchCompat) findViewById(R.id.swShowWhatsapp);
+        swShowWhatsapp.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_WHATSAPP))){
             swShowWhatsapp.setChecked(true);
+            formData.put("show_whatsapp","1");
+        } else {
+            formData.put("show_whatsapp","0");
         }
 
         /* Adicionando FocusListener*/
@@ -244,15 +270,15 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
             }
         });
 
-        Button btSingUp = (Button) findViewById(R.id.btSignup);
-        btSingUp.setOnClickListener(new View.OnClickListener() {
+        Button btSave = (Button) findViewById(R.id.btSave);
+        btSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final ProgressDialogHelper progressHelper = new ProgressDialogHelper(AccountActivity.this);
                 if (NetworkHelper.isOnline(AccountActivity.this)) {
                     if (isValidForm()) {
-                        progressHelper.createProgressSpinner("Aguarde", "Realizando cadastro", true, false);
-                        NetworkHelper.getInstance(AccountActivity.this).doSignUp(formData, new ResponseCallback() {
+                        progressHelper.createProgressSpinner("Aguarde", "Salvando", true, false);
+                        NetworkHelper.getInstance(AccountActivity.this).savePreferences(formData, new ResponseCallback() {
                             @Override
                             public void onSuccess(String jsonStringResponse) {
                                 try {
@@ -644,6 +670,54 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
                     //TODO: Lançar exceção
                 }
             }
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        switch (compoundButton.getId()){
+            case R.id.swShowBirthday:
+                if(swShowBirthday.isChecked()){
+                    formData.put("show_birthday","1");
+                } else {
+                    formData.put("show_birthday","0");
+                }
+                break;
+            case R.id.swShowEmail:
+                if(swShowEmail.isChecked()){
+                    formData.put("show_email","1");
+                } else {
+                    formData.put("show_email","0");
+                }
+                break;
+            case R.id.swShowCity:
+                if(swShowCity.isChecked()){
+                    formData.put("show_city","1");
+                } else {
+                    formData.put("show_city","0");
+                }
+                break;
+            case R.id.swShowNeighborhood:
+                if(swShowNeighborhood.isChecked()){
+                    formData.put("show_neighborhood","1");
+                } else {
+                    formData.put("show_neighborhood","0");
+                }
+                break;
+            case R.id.swShowPhone:
+                if(swShowPhone.isChecked()){
+                    formData.put("show_phone","1");
+                } else {
+                    formData.put("show_phone","0");
+                }
+                break;
+            case R.id.swShowWhatsapp:
+                if(swShowWhatsapp.isChecked()){
+                    formData.put("show_whatsapp","1");
+                } else {
+                    formData.put("show_whatsapp","0");
+                }
+                break;
         }
     }
 }
