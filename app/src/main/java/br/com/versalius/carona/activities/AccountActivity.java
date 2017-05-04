@@ -177,49 +177,49 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         swShowBirthday.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_BIRTHDAY))){
             swShowBirthday.setChecked(true);
-            formData.put("show_birthday","1");
+            formData.put("show_birthday","true");
         } else {
-            formData.put("show_birthday","0");
+            formData.put("show_birthday","false");
         }
         swShowEmail = (SwitchCompat) findViewById(R.id.swShowEmail);
         swShowEmail.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_EMAIL))){
             swShowEmail.setChecked(true);
-            formData.put("show_email","1");
+            formData.put("show_email","true");
         } else {
-            formData.put("show_email","0");
+            formData.put("show_email","false");
         }
         swShowCity = (SwitchCompat) findViewById(R.id.swShowCity);
         swShowCity.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_CITY))){
             swShowCity.setChecked(true);
-            formData.put("show_city","1");
+            formData.put("show_city","true");
         } else {
-            formData.put("show_city","0");
+            formData.put("show_city","false");
         }
         swShowNeighborhood = (SwitchCompat) findViewById(R.id.swShowNeighborhood);
         swShowNeighborhood.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_NEIGHBORHOOD))){
             swShowNeighborhood.setChecked(true);
-            formData.put("show_neighborhood","1");
+            formData.put("show_neighborhood","true");
         } else {
-            formData.put("show_neighborhood","0");
+            formData.put("show_neighborhood","false");
         }
         swShowPhone = (SwitchCompat) findViewById(R.id.swShowPhone);
         swShowPhone.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_PHONE))){
             swShowPhone.setChecked(true);
-            formData.put("show_phone","1");
+            formData.put("show_phone","true");
         } else {
-            formData.put("show_phone","0");
+            formData.put("show_phone","false");
         }
         swShowWhatsapp = (SwitchCompat) findViewById(R.id.swShowWhatsapp);
         swShowWhatsapp.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_WHATSAPP))){
             swShowWhatsapp.setChecked(true);
-            formData.put("show_whatsapp","1");
+            formData.put("show_whatsapp","true");
         } else {
-            formData.put("show_whatsapp","0");
+            formData.put("show_whatsapp","false");
         }
 
         /* Adicionando FocusListener*/
@@ -285,10 +285,10 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
                                     progressHelper.dismiss();
                                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
                                     if(jsonObject.getBoolean("status")){
-                                        CustomSnackBar.make(coordinatorLayout, "Cadastro realizado com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
+                                        CustomSnackBar.make(coordinatorLayout, "Atualização realizada com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
                                         finish();
                                     } else {
-                                        CustomSnackBar.make(coordinatorLayout, "Falha ao realizar cadastro", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
+                                        CustomSnackBar.make(coordinatorLayout, "Falha ao realizar atualização", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -678,44 +678,44 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         switch (compoundButton.getId()){
             case R.id.swShowBirthday:
                 if(swShowBirthday.isChecked()){
-                    formData.put("show_birthday","1");
+                    formData.put("show_birthday","true");
                 } else {
-                    formData.put("show_birthday","0");
+                    formData.put("show_birthday","false");
                 }
                 break;
             case R.id.swShowEmail:
                 if(swShowEmail.isChecked()){
-                    formData.put("show_email","1");
+                    formData.put("show_email","true");
                 } else {
-                    formData.put("show_email","0");
+                    formData.put("show_email","false");
                 }
                 break;
             case R.id.swShowCity:
                 if(swShowCity.isChecked()){
-                    formData.put("show_city","1");
+                    formData.put("show_city","true");
                 } else {
-                    formData.put("show_city","0");
+                    formData.put("show_city","false");
                 }
                 break;
             case R.id.swShowNeighborhood:
                 if(swShowNeighborhood.isChecked()){
-                    formData.put("show_neighborhood","1");
+                    formData.put("show_neighborhood","true");
                 } else {
-                    formData.put("show_neighborhood","0");
+                    formData.put("show_neighborhood","false");
                 }
                 break;
             case R.id.swShowPhone:
                 if(swShowPhone.isChecked()){
-                    formData.put("show_phone","1");
+                    formData.put("show_phone","true");
                 } else {
-                    formData.put("show_phone","0");
+                    formData.put("show_phone","false");
                 }
                 break;
             case R.id.swShowWhatsapp:
                 if(swShowWhatsapp.isChecked()){
-                    formData.put("show_whatsapp","1");
+                    formData.put("show_whatsapp","true");
                 } else {
-                    formData.put("show_whatsapp","0");
+                    formData.put("show_whatsapp","false");
                 }
                 break;
         }

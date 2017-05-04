@@ -29,11 +29,11 @@ public class NetworkHelper {
     private RequestQueue requestQueue;
 
 //    private final String DOMINIO = "http://giog.000webhostapp.com/"; // Remoto
-    public static final String DOMINIO = "http://10.1.1.108/caronauesc-web/"; // Repo
+    public static final String DOMINIO = "http://10.1.1.105/caronauesc-web/"; // Repo
     private final String API = "api/";
     private final String LOGIN = API+"UserService/login";
     private final String SIGNUP = API+"UserService/signup";
-    private final String SAVE_PREFS = API+"UserService/save_prefs";
+    private final String UPDATE = API+"UserService/update";
     private final String CHECK_EMAIL = API+"UserService/email_check";
     private final String GET_RIDES = API+"RideService/get_by_status";
     private final String GET_USER = API+"UserService/get_user_by_id";
@@ -84,7 +84,7 @@ public class NetworkHelper {
         execute(Request.Method.POST,
                 params,
                 TAG,
-                DOMINIO + SAVE_PREFS,
+                DOMINIO + UPDATE,
                 callback);
     }
 
