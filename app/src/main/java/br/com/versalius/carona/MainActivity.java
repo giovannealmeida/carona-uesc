@@ -31,6 +31,7 @@ import com.github.clans.fab.FloatingActionMenu;
 import br.com.versalius.carona.activities.AccountActivity;
 import br.com.versalius.carona.activities.LoginActivity;
 import br.com.versalius.carona.adapters.RideAdapter;
+import br.com.versalius.carona.fragments.AccountSettingsFragment;
 import br.com.versalius.carona.fragments.AvailableRidesFragment;
 import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.models.Vehicle;
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_ride_history) {
 
         } else if (id == R.id.nav_account_settings) {
-            startActivity(new Intent(this, AccountActivity.class));
+            showFragment(AccountSettingsFragment.newInstance());
         } else if (id == R.id.nav_donate) {
 
         } else if (id == R.id.nav_send_email) {

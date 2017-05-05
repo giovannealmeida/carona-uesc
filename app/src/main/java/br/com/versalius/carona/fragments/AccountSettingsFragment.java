@@ -1,4 +1,5 @@
-package br.com.versalius.carona.activities;
+package br.com.versalius.carona.fragments;
+
 
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
@@ -15,16 +16,17 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
@@ -32,6 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -51,6 +54,8 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import br.com.versalius.carona.R;
+import br.com.versalius.carona.activities.AccountActivity;
+import br.com.versalius.carona.activities.CropActivity;
 import br.com.versalius.carona.network.NetworkHelper;
 import br.com.versalius.carona.network.ResponseCallback;
 import br.com.versalius.carona.utils.CustomSnackBar;
@@ -58,7 +63,9 @@ import br.com.versalius.carona.utils.PreferencesHelper;
 import br.com.versalius.carona.utils.ProgressDialogHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AccountActivity extends AppCompatActivity implements View.OnFocusChangeListener, TextWatcher, CompoundButton.OnCheckedChangeListener {
+import static android.app.Activity.RESULT_OK;
+
+public class AccountSettingsFragment extends Fragment implements View.OnFocusChangeListener, TextWatcher, CompoundButton.OnCheckedChangeListener {
 
     private TextInputLayout tilFirstName;
     private TextInputLayout tilLastName;
@@ -78,6 +85,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
     private RadioGroup rgGender;
     private RadioButton rbMale;
     private RadioButton rbFemale;
+    private TextView tvRgErrMessage;
 
     private SwitchCompat swShowBirthday;
     private SwitchCompat swShowEmail;
@@ -97,26 +105,33 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
     private static final int ACTION_RESULT_GET_IMAGE = 1000;
     private static final int REQUEST_PERMISSION_CODE = 1001;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_account_settings);
-        EventBus.getDefault().register(this);
-        formData = new HashMap<>();
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(R.string.title_activity_account);
-
-        setUpViews();
+    public static AccountSettingsFragment newInstance() {
+        return new AccountSettingsFragment();
     }
 
-    private void setUpViews() {
-        PreferencesHelper pref = PreferencesHelper.getInstance(this);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+        formData = new HashMap<>();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_account_settings, container, false);
+
+        setUpViews(rootView);
+
+        return rootView;
+    }
+
+    private void setUpViews(View rootView) {
+        PreferencesHelper pref = PreferencesHelper.getInstance(getActivity());
 
         formData.put("user_id",pref.load(PreferencesHelper.USER_ID));
-        ivProfile = (CircleImageView) findViewById(R.id.ivProfile);
-        ivUrlProfile = (SimpleDraweeView)  findViewById(R.id.ivUrlProfile);
+        ivProfile = (CircleImageView) rootView.findViewById(R.id.ivProfile);
+        ivUrlProfile = (SimpleDraweeView) rootView.findViewById(R.id.ivUrlProfile);
         Uri uri = Uri.parse(pref.load(PreferencesHelper.USER_IMAGE_URL));
         if(!uri.toString().isEmpty() && !uri.toString().equals("null")) {
             ivUrlProfile.setImageURI(uri);
@@ -128,52 +143,53 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
             ivProfile.setVisibility(View.VISIBLE);
         }
         /* Pegar imagem */
-        ImageButton btGetImage = (ImageButton) findViewById(R.id.btGetImage);
+        ImageButton btGetImage = (ImageButton) rootView.findViewById(R.id.btGetImage);
         btGetImage.setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(AccountActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
                         PackageManager.PERMISSION_GRANTED) {
                     Intent i = new Intent(Intent.ACTION_PICK);
                     i.setType("image/*");
                     startActivityForResult(i, ACTION_RESULT_GET_IMAGE);
                 } else {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(AccountActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
                         callDialog("O AkiJob precisa de permissão para acessar os arquivos do dispositivo", new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE});
                     } else {
-                        ActivityCompat.requestPermissions(AccountActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_CODE);
+                        ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_CODE);
                     }
                 }
             }
         });
 
+        tvRgErrMessage = (TextView) rootView.findViewById(R.id.tvRgErrMessage);
         /* Instanciando layouts */
-        tilFirstName = (TextInputLayout) findViewById(R.id.tilFirstName);
-        tilLastName = (TextInputLayout) findViewById(R.id.tilLastName);
-        tilCity = (TextInputLayout) findViewById(R.id.tilCity);
-        tilNeighborhood = (TextInputLayout) findViewById(R.id.tilNeighborhood);
-        tilPhone = (TextInputLayout) findViewById(R.id.tilPhone);
-        tilWhatsapp = (TextInputLayout) findViewById(R.id.tilWhatsapp);
+        tilFirstName = (TextInputLayout) rootView.findViewById(R.id.tilFirstName);
+        tilLastName = (TextInputLayout) rootView.findViewById(R.id.tilLastName);
+        tilCity = (TextInputLayout) rootView.findViewById(R.id.tilCity);
+        tilNeighborhood = (TextInputLayout) rootView.findViewById(R.id.tilNeighborhood);
+        tilPhone = (TextInputLayout) rootView.findViewById(R.id.tilPhone);
+        tilWhatsapp = (TextInputLayout) rootView.findViewById(R.id.tilWhatsapp);
 
         /* Instanciando campos */
-        etFirstName = (EditText) findViewById(R.id.etFirstName);
+        etFirstName = (EditText) rootView.findViewById(R.id.etFirstName);
         etFirstName.setText(pref.load(PreferencesHelper.USER_FIRST_NAME));
-        etLastName = (EditText) findViewById(R.id.etLastName);
+        etLastName = (EditText) rootView.findViewById(R.id.etLastName);
         etLastName.setText(pref.load(PreferencesHelper.USER_LAST_NAME));
-        etCity = (EditText) findViewById(R.id.etCity);
+        etCity = (EditText) rootView.findViewById(R.id.etCity);
         etCity.setText(pref.load(PreferencesHelper.USER_CITY));
-        etNeighborhood = (EditText) findViewById(R.id.etNeighborhood);
+        etNeighborhood = (EditText) rootView.findViewById(R.id.etNeighborhood);
         etNeighborhood.setText(pref.load(PreferencesHelper.USER_NEIGHBORHOOD));
-        etBirthday = (EditText) findViewById(R.id.etBirthday);
+        etBirthday = (EditText) rootView.findViewById(R.id.etBirthday);
         etBirthday.setText(pref.load(PreferencesHelper.USER_BIRTHDAY));
-        etPhone = (EditText) findViewById(R.id.etPhone);
+        etPhone = (EditText) rootView.findViewById(R.id.etPhone);
         etPhone.setText(pref.load(PreferencesHelper.USER_PHONE));
-        etWhatsapp = (EditText) findViewById(R.id.etWhatsapp);
+        etWhatsapp = (EditText) rootView.findViewById(R.id.etWhatsapp);
         etWhatsapp.setText(pref.load(PreferencesHelper.USER_WHATSAPP));
 
         /* Instanciando switches */
-        swShowBirthday = (SwitchCompat) findViewById(R.id.swShowBirthday);
+        swShowBirthday = (SwitchCompat) rootView.findViewById(R.id.swShowBirthday);
         swShowBirthday.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_BIRTHDAY))){
             swShowBirthday.setChecked(true);
@@ -181,7 +197,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         } else {
             formData.put("show_birthday","false");
         }
-        swShowEmail = (SwitchCompat) findViewById(R.id.swShowEmail);
+        swShowEmail = (SwitchCompat) rootView.findViewById(R.id.swShowEmail);
         swShowEmail.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_EMAIL))){
             swShowEmail.setChecked(true);
@@ -189,7 +205,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         } else {
             formData.put("show_email","false");
         }
-        swShowCity = (SwitchCompat) findViewById(R.id.swShowCity);
+        swShowCity = (SwitchCompat) rootView.findViewById(R.id.swShowCity);
         swShowCity.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_CITY))){
             swShowCity.setChecked(true);
@@ -197,7 +213,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         } else {
             formData.put("show_city","false");
         }
-        swShowNeighborhood = (SwitchCompat) findViewById(R.id.swShowNeighborhood);
+        swShowNeighborhood = (SwitchCompat) rootView.findViewById(R.id.swShowNeighborhood);
         swShowNeighborhood.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_NEIGHBORHOOD))){
             swShowNeighborhood.setChecked(true);
@@ -205,7 +221,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         } else {
             formData.put("show_neighborhood","false");
         }
-        swShowPhone = (SwitchCompat) findViewById(R.id.swShowPhone);
+        swShowPhone = (SwitchCompat) rootView.findViewById(R.id.swShowPhone);
         swShowPhone.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_PHONE))){
             swShowPhone.setChecked(true);
@@ -213,7 +229,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         } else {
             formData.put("show_phone","false");
         }
-        swShowWhatsapp = (SwitchCompat) findViewById(R.id.swShowWhatsapp);
+        swShowWhatsapp = (SwitchCompat) rootView.findViewById(R.id.swShowWhatsapp);
         swShowWhatsapp.setOnCheckedChangeListener(this);
         if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_WHATSAPP))){
             swShowWhatsapp.setChecked(true);
@@ -235,14 +251,14 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         etWhatsapp.addTextChangedListener(this);
 
         /* Radio buttons*/
-        rgGender = (RadioGroup) findViewById(R.id.rgGender);
-        rbMale = (RadioButton) findViewById(R.id.rbMale);
-        rbFemale = (RadioButton) findViewById(R.id.rbFemale);
+        rgGender = (RadioGroup) rootView.findViewById(R.id.rgGender);
+        rbMale = (RadioButton) rootView.findViewById(R.id.rbMale);
+        rbFemale = (RadioButton) rootView.findViewById(R.id.rbFemale);
 
         /**** Seta o comportamento do DatePicker ****/
         final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
         Calendar nowCalendar = Calendar.getInstance();
-        final DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+        final DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
 
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Calendar newDate = Calendar.getInstance();
@@ -270,15 +286,15 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
             }
         });
 
-        Button btSave = (Button) findViewById(R.id.btSave);
+        Button btSave = (Button) rootView.findViewById(R.id.btSave);
         btSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final ProgressDialogHelper progressHelper = new ProgressDialogHelper(AccountActivity.this);
-                if (NetworkHelper.isOnline(AccountActivity.this)) {
+                final ProgressDialogHelper progressHelper = new ProgressDialogHelper(getActivity());
+                if (NetworkHelper.isOnline(getActivity())) {
                     if (isValidForm()) {
                         progressHelper.createProgressSpinner("Aguarde", "Salvando", true, false);
-                        NetworkHelper.getInstance(AccountActivity.this).savePreferences(formData, new ResponseCallback() {
+                        NetworkHelper.getInstance(getActivity()).savePreferences(formData, new ResponseCallback() {
                             @Override
                             public void onSuccess(String jsonStringResponse) {
                                 try {
@@ -286,7 +302,6 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
                                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
                                     if(jsonObject.getBoolean("status")){
                                         CustomSnackBar.make(coordinatorLayout, "Atualização realizada com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
-                                        finish();
                                     } else {
                                         CustomSnackBar.make(coordinatorLayout, "Falha ao realizar atualização", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
                                     }
@@ -429,10 +444,10 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
 
     private boolean hasValidGender() {
         if (!rbMale.isChecked() && !rbFemale.isChecked()) {
-            (findViewById(R.id.tvRgErrMessage)).setVisibility(View.VISIBLE);
+            tvRgErrMessage.setVisibility(View.VISIBLE);
             return false;
         }
-        (findViewById(R.id.tvRgErrMessage)).setVisibility(View.GONE);
+        tvRgErrMessage.setVisibility(View.GONE);
         return true;
     }
 
@@ -489,21 +504,6 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
         return !TextUtils.isEmpty(etBirthday.getText().toString().trim());
     }
 
-    /**
-     * NÃO REMOVER DE NOVO!!!!
-     * Basicamente seta a ação de fechar a activity ao selecionar a seta na toolbar
-     *
-     * @param menuItem
-     * @return
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == android.R.id.home) {
-            finish();
-        }
-        return super.onOptionsItemSelected(menuItem);
-    }
-
     @Override
     public void onFocusChange(View view, boolean hasFocus) {
         if (!hasFocus) { /* Verifica somente quando o foco é perdido */
@@ -531,12 +531,12 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ACTION_RESULT_GET_IMAGE && resultCode == RESULT_OK) {
             Uri selectedImage = data.getData();
             //Com base na URI da imagem selecionada, prepara o acesso ao banco de dados interno pra pegar a imagem
             String[] columns = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(selectedImage, columns, null, null, null);
+            Cursor cursor = getActivity().getContentResolver().query(selectedImage, columns, null, null, null);
             cursor.moveToFirst();
 
             int columnIndex = cursor.getColumnIndex(columns[0]);
@@ -544,12 +544,12 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
             cursor.close();
 
             //Passa o caminho da imagem pra activity que vai fazer o crop
-            startActivity(new Intent(this, CropActivity.class).putExtra("imagePath", imagePath));
+            startActivity(new Intent(getActivity(), CropActivity.class).putExtra("imagePath", imagePath));
         }
     }
 
     private void callDialog(String message, final String[] permissions) {
-        mMaterialDialog = new MaterialDialog.Builder(this)
+        mMaterialDialog = new MaterialDialog.Builder(getActivity())
                 .title(R.string.dialog_title_permission)
                 .content(message)
                 .positiveText(R.string.dialog_permission_agree_button)
@@ -557,7 +557,7 @@ public class AccountActivity extends AppCompatActivity implements View.OnFocusCh
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        ActivityCompat.requestPermissions(AccountActivity.this, permissions, REQUEST_PERMISSION_CODE);
+                        ActivityCompat.requestPermissions(getActivity(), permissions, REQUEST_PERMISSION_CODE);
                         mMaterialDialog.dismiss();
                     }
                 })
