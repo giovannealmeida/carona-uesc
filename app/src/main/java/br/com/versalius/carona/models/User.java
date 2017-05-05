@@ -20,10 +20,14 @@ import br.com.versalius.carona.network.NetworkHelper;
 
 public class User implements Serializable{
 
+    public static int GENDER_MALE = 1;
+    public static int GENDER_FEMALE = 2;
+
     private int id;
     private List<Vehicle> vehicles;
     private String firstName;
     private String lastName;
+    private int genderId;
     private String phone = "";
     private String whatsapp = "";
     private String city;
@@ -53,7 +57,7 @@ public class User implements Serializable{
             }
             this.firstName = json.optString("u_first_name","User");
             this.lastName = json.optString("u_last_name","");
-
+            this.genderId = json.getInt("u_gender_id");
             if(!json.getString("u_phone").equals("null")) {
                 this.phone = json.optString("u_phone", "");
             }
@@ -189,5 +193,9 @@ public class User implements Serializable{
 
     public boolean isShowWhatsapp() {
         return showWhatsapp;
+    }
+
+    public int getGenderId() {
+        return genderId;
     }
 }

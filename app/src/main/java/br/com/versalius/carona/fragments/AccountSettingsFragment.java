@@ -55,20 +55,26 @@ import java.util.Locale;
 
 import br.com.versalius.carona.R;
 import br.com.versalius.carona.activities.CropActivity;
-import br.com.versalius.carona.interfaces.OnMessageDeliveredListener;
+import br.com.versalius.carona.interfaces.MessageDeliveredListener;
+import br.com.versalius.carona.interfaces.UserUpdateListener;
+import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.network.NetworkHelper;
 import br.com.versalius.carona.network.ResponseCallback;
 import br.com.versalius.carona.utils.CustomSnackBar;
 import br.com.versalius.carona.utils.PreferencesHelper;
 import br.com.versalius.carona.utils.ProgressDialogHelper;
+import br.com.versalius.carona.utils.SessionHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.app.Activity.RESULT_OK;
 
 public class AccountSettingsFragment extends Fragment implements View.OnFocusChangeListener, TextWatcher, CompoundButton.OnCheckedChangeListener {
 
-    private OnMessageDeliveredListener listener;
+    //Listeners
+    private MessageDeliveredListener messageDeliveredListener;
+    private UserUpdateListener userUpdateListener;
 
+    //Campos
     private TextInputLayout tilFirstName;
     private TextInputLayout tilLastName;
     private TextInputLayout tilCity;
@@ -231,12 +237,6 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         }
         swShowWhatsapp = (SwitchCompat) rootView.findViewById(R.id.swShowWhatsapp);
         swShowWhatsapp.setOnCheckedChangeListener(this);
-        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_WHATSAPP))){
-            swShowWhatsapp.setChecked(true);
-            formData.put("show_whatsapp","true");
-        } else {
-            formData.put("show_whatsapp","false");
-        }
 
         /* Adicionando FocusListener*/
         etFirstName.setOnFocusChangeListener(this);
@@ -254,6 +254,12 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         rgGender = (RadioGroup) rootView.findViewById(R.id.rgGender);
         rbMale = (RadioButton) rootView.findViewById(R.id.rbMale);
         rbFemale = (RadioButton) rootView.findViewById(R.id.rbFemale);
+
+        if(Integer.valueOf(pref.load(PreferencesHelper.USER_GENDER_ID)) == 1){
+            rbMale.setChecked(true);
+        } else {
+            rbFemale.setChecked(true);
+        }
 
         /**** Seta o comportamento do DatePicker ****/
         final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
@@ -301,9 +307,12 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
                                     progressHelper.dismiss();
                                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
                                     if(jsonObject.getBoolean("status")){
-                                        listener.showMessage("Atualização realizada com sucesso",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.SUCCESS);
+                                        User user = new User(jsonObject.getJSONObject("data"));
+                                        new SessionHelper(getActivity()).saveUser(user);
+                                        userUpdateListener.OnUserPreferencesUpdate(user);
+                                        messageDeliveredListener.onMessageDelivered("Atualização realizada com sucesso",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.SUCCESS);
                                     } else {
-                                        listener.showMessage("Falha ao realizar atualização",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
+                                        messageDeliveredListener.onMessageDelivered("Falha ao realizar atualização",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -313,12 +322,12 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
                             @Override
                             public void onFail(VolleyError error) {
                                 progressHelper.dismiss();
-                                listener.showMessage("Falha ao atualizar. Tente mais tarde!",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
+                                messageDeliveredListener.onMessageDelivered("Falha ao atualizar. Tente mais tarde!",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
                             }
                         });
                     }
                 } else {
-                    listener.showMessage("Você está offline",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
+                    messageDeliveredListener.onMessageDelivered("Você está offline",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
                 }
             }
         });
@@ -381,9 +390,9 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
             }
         } else {
             if (rbFemale.isChecked()) {
-                formData.put("gender_id", "2");
+                formData.put("gender_id", String.valueOf(User.GENDER_FEMALE));
             } else {
-                formData.put("gender_id", "1");
+                formData.put("gender_id", String.valueOf(User.GENDER_MALE));
             }
         }
 
@@ -588,11 +597,14 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnMessageDeliveredListener) {
-            listener = (OnMessageDeliveredListener) context;
-        } else {
+        if (context instanceof MessageDeliveredListener) {
+            messageDeliveredListener = (MessageDeliveredListener) context;
+        }/* else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnMessageDeliveredListener");
+                    + " must implement MessageDeliveredListener");
+        }*/
+        if (context instanceof UserUpdateListener) {
+            userUpdateListener = (UserUpdateListener) context;
         }
     }
 
@@ -600,7 +612,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
-        listener = null;
+        messageDeliveredListener = null;
     }
 
 

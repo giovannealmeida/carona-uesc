@@ -32,36 +32,63 @@ import com.github.clans.fab.FloatingActionMenu;
 import br.com.versalius.carona.activities.LoginActivity;
 import br.com.versalius.carona.fragments.AccountSettingsFragment;
 import br.com.versalius.carona.fragments.AvailableRidesFragment;
-import br.com.versalius.carona.interfaces.OnMessageDeliveredListener;
+import br.com.versalius.carona.interfaces.MessageDeliveredListener;
+import br.com.versalius.carona.interfaces.UserUpdateListener;
 import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.models.Vehicle;
 import br.com.versalius.carona.utils.CustomSnackBar;
 import br.com.versalius.carona.utils.SessionHelper;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AvailableRidesFragment.OnRideListScrollListener, OnMessageDeliveredListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        AvailableRidesFragment.OnRideListScrollListener,
+        MessageDeliveredListener,
+        UserUpdateListener{
 
     private FloatingActionMenu fab;
     private CoordinatorLayout coordinatorLayout;
+    private Toolbar toolbar;
+
+    //Drawer info
+    private TextView tvUsername;
+    private SimpleDraweeView userPhoto;
+    private TextView tvCurrentVehicle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getResources().getString(R.string.item_menu_available_rides));
         setSupportActionBar(toolbar);
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         setUpFabs();
-        setUpDrawer(toolbar);
+
+        setUpDrawer();
+
         showFragment(AvailableRidesFragment.newInstance());
     }
 
-    private void setUpDrawer(Toolbar toolbar) {
+    private void setUpDrawer() {
+
         //Recupera usuário
         User user = (User) getIntent().getExtras().getSerializable("user");
+
+        //Instancia elementos do header
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        View navHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        tvUsername = (TextView) navHeader.findViewById(R.id.tvUsername);
+        userPhoto = (SimpleDraweeView) navHeader.findViewById(R.id.ivProfile);
+
+        RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+        roundingParams.setRoundAsCircle(true);
+        userPhoto.getHierarchy().setRoundingParams(roundingParams);
+
+        updateDrawerUserInfo(user);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -69,24 +96,12 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        //Seta o header
-        //Nome do usuário
-        View navHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
-        ((TextView) navHeader.findViewById(R.id.tvUsername)).setText(user.getFullName());
-        //Foto do usuário
-        SimpleDraweeView draweeView = (SimpleDraweeView) navHeader.findViewById(R.id.ivProfile);
-        if (user.getPhotoUrl() != null) {
-            Uri uri = Uri.parse(user.getPhotoUrl());
-            draweeView.setImageURI(uri);
-        }
-        RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
-        roundingParams.setRoundAsCircle(true);
-        draweeView.getHierarchy().setRoundingParams(roundingParams);
-        TextView tvCurrentVehicle = (TextView) navHeader.findViewById(R.id.tvCurrentVehicle);
+        tvCurrentVehicle = (TextView) navHeader.findViewById(R.id.tvCurrentVehicle);
         Vehicle vehicle = user.getActiveCar();
+        updateDrawerVehicleInfo(vehicle);
+    }
+
+    private void updateDrawerVehicleInfo(Vehicle vehicle) {
         if (vehicle != null) {
             //Marca e modelo do carro
             tvCurrentVehicle.setText(vehicle.getBrand() + " - " + vehicle.getModel());
@@ -97,6 +112,15 @@ public class MainActivity extends AppCompatActivity
             }
         } else {
             tvCurrentVehicle.setText(getResources().getString(R.string.lb_passenger));
+        }
+    }
+
+    private void updateDrawerUserInfo(User user) {
+        tvUsername.setText(user.getFullName());
+
+        if (user.getPhotoUrl() != null) {
+            Uri uri = Uri.parse(user.getPhotoUrl());
+            userPhoto.setImageURI(uri);
         }
     }
 
@@ -211,8 +235,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void showMessage(String message, int duration, int type) {
+    public void onMessageDelivered(String message, int duration, int type) {
         CustomSnackBar.make(coordinatorLayout, message, duration, type).show();
+    }
+
+    @Override
+    public void OnUserPreferencesUpdate(User user) {
+        updateDrawerUserInfo(user);
+    }
+
+    @Override
+    public void OnVehicleUpdate(Vehicle vehicle) {
+        updateDrawerVehicleInfo(vehicle);
     }
 
     public static class LogoutDialog extends DialogFragment {
