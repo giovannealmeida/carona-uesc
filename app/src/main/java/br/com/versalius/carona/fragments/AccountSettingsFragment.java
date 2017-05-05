@@ -135,11 +135,11 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
     private void setUpViews(View rootView) {
         PreferencesHelper pref = PreferencesHelper.getInstance(getActivity());
 
-        formData.put("user_id",pref.load(PreferencesHelper.USER_ID));
+        formData.put("user_id", pref.load(PreferencesHelper.USER_ID));
         ivProfile = (CircleImageView) rootView.findViewById(R.id.ivProfile);
         ivUrlProfile = (SimpleDraweeView) rootView.findViewById(R.id.ivUrlProfile);
         Uri uri = Uri.parse(pref.load(PreferencesHelper.USER_IMAGE_URL));
-        if(!uri.toString().isEmpty() && !uri.toString().equals("null")) {
+        if (!uri.toString().isEmpty() && !uri.toString().equals("null")) {
             ivUrlProfile.setImageURI(uri);
             RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
             roundingParams.setRoundAsCircle(true);
@@ -197,46 +197,52 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         /* Instanciando switches */
         swShowBirthday = (SwitchCompat) rootView.findViewById(R.id.swShowBirthday);
         swShowBirthday.setOnCheckedChangeListener(this);
-        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_BIRTHDAY))){
+        if (Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_BIRTHDAY))) {
             swShowBirthday.setChecked(true);
-            formData.put("show_birthday","true");
+            formData.put("show_birthday", "true");
         } else {
-            formData.put("show_birthday","false");
+            formData.put("show_birthday", "false");
         }
         swShowEmail = (SwitchCompat) rootView.findViewById(R.id.swShowEmail);
         swShowEmail.setOnCheckedChangeListener(this);
-        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_EMAIL))){
+        if (Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_EMAIL))) {
             swShowEmail.setChecked(true);
-            formData.put("show_email","true");
+            formData.put("show_email", "true");
         } else {
-            formData.put("show_email","false");
+            formData.put("show_email", "false");
         }
         swShowCity = (SwitchCompat) rootView.findViewById(R.id.swShowCity);
         swShowCity.setOnCheckedChangeListener(this);
-        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_CITY))){
+        if (Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_CITY))) {
             swShowCity.setChecked(true);
-            formData.put("show_city","true");
+            formData.put("show_city", "true");
         } else {
-            formData.put("show_city","false");
+            formData.put("show_city", "false");
         }
         swShowNeighborhood = (SwitchCompat) rootView.findViewById(R.id.swShowNeighborhood);
         swShowNeighborhood.setOnCheckedChangeListener(this);
-        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_NEIGHBORHOOD))){
+        if (Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_NEIGHBORHOOD))) {
             swShowNeighborhood.setChecked(true);
-            formData.put("show_neighborhood","true");
+            formData.put("show_neighborhood", "true");
         } else {
-            formData.put("show_neighborhood","false");
+            formData.put("show_neighborhood", "false");
         }
         swShowPhone = (SwitchCompat) rootView.findViewById(R.id.swShowPhone);
         swShowPhone.setOnCheckedChangeListener(this);
-        if(Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_PHONE))){
+        if (Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_PHONE))) {
             swShowPhone.setChecked(true);
-            formData.put("show_phone","true");
+            formData.put("show_phone", "true");
         } else {
-            formData.put("show_phone","false");
+            formData.put("show_phone", "false");
         }
         swShowWhatsapp = (SwitchCompat) rootView.findViewById(R.id.swShowWhatsapp);
         swShowWhatsapp.setOnCheckedChangeListener(this);
+        if (Boolean.valueOf(pref.load(PreferencesHelper.PREF_SHOW_WHATSAPP))) {
+            swShowWhatsapp.setChecked(true);
+            formData.put("show_whatsapp", "true");
+        } else {
+            formData.put("show_whatsapp", "false");
+        }
 
         /* Adicionando FocusListener*/
         etFirstName.setOnFocusChangeListener(this);
@@ -255,7 +261,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         rbMale = (RadioButton) rootView.findViewById(R.id.rbMale);
         rbFemale = (RadioButton) rootView.findViewById(R.id.rbFemale);
 
-        if(Integer.valueOf(pref.load(PreferencesHelper.USER_GENDER_ID)) == 1){
+        if (Integer.valueOf(pref.load(PreferencesHelper.USER_GENDER_ID)) == 1) {
             rbMale.setChecked(true);
         } else {
             rbFemale.setChecked(true);
@@ -306,13 +312,13 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
                                 try {
                                     progressHelper.dismiss();
                                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
-                                    if(jsonObject.getBoolean("status")){
+                                    if (jsonObject.getBoolean("status")) {
                                         User user = new User(jsonObject.getJSONObject("data"));
                                         new SessionHelper(getActivity()).saveUser(user);
                                         userUpdateListener.OnUserPreferencesUpdate(user);
-                                        messageDeliveredListener.onMessageDelivered("Atualização realizada com sucesso",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.SUCCESS);
+                                        messageDeliveredListener.onMessageDelivered("Atualização realizada com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS);
                                     } else {
-                                        messageDeliveredListener.onMessageDelivered("Falha ao realizar atualização",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
+                                        messageDeliveredListener.onMessageDelivered("Falha ao realizar atualização", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.ERROR);
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -322,12 +328,12 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
                             @Override
                             public void onFail(VolleyError error) {
                                 progressHelper.dismiss();
-                                messageDeliveredListener.onMessageDelivered("Falha ao atualizar. Tente mais tarde!",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
+                                messageDeliveredListener.onMessageDelivered("Falha ao atualizar. Tente mais tarde!", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.ERROR);
                             }
                         });
                     }
                 } else {
-                    messageDeliveredListener.onMessageDelivered("Você está offline",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
+                    messageDeliveredListener.onMessageDelivered("Você está offline", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.ERROR);
                 }
             }
         });
@@ -425,7 +431,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
 
         //O telefone não é obrigatório. Se não estiver vazio, verifica se é válido
         if (!TextUtils.isEmpty(phone)) {
-            if (((phone.length() < 13) || (phoneNumber.length < 2))||
+            if (((phone.length() < 13) || (phoneNumber.length < 2)) ||
                     ((phoneNumber[1].length() != 4) || ((phoneNumber[0].length() != 8) && (phoneNumber[0].length() != 9)))) {
                 tilPhone.setError(getResources().getString(R.string.err_msg_invalid_phone));
                 return false;
@@ -441,7 +447,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
 
         //O Whatsapp não é obrigatório. Se não estiver vazio, verifica se é válido
         if (!TextUtils.isEmpty(phone)) {
-            if (((phone.length() < 13) || (phoneNumber.length < 2))||
+            if (((phone.length() < 13) || (phoneNumber.length < 2)) ||
                     ((phoneNumber[1].length() != 4) || ((phoneNumber[0].length() != 8) && (phoneNumber[0].length() != 9)))) {
                 tilWhatsapp.setError(getResources().getString(R.string.err_msg_invalid_whatsapp));
                 return false;
@@ -509,7 +515,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         return true;
     }
 
-    private boolean hasValidBirthDay(){
+    private boolean hasValidBirthDay() {
         return !TextUtils.isEmpty(etBirthday.getText().toString().trim());
     }
 
@@ -699,47 +705,47 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-        switch (compoundButton.getId()){
+        switch (compoundButton.getId()) {
             case R.id.swShowBirthday:
-                if(swShowBirthday.isChecked()){
-                    formData.put("show_birthday","true");
+                if (swShowBirthday.isChecked()) {
+                    formData.put("show_birthday", "true");
                 } else {
-                    formData.put("show_birthday","false");
+                    formData.put("show_birthday", "false");
                 }
                 break;
             case R.id.swShowEmail:
-                if(swShowEmail.isChecked()){
-                    formData.put("show_email","true");
+                if (swShowEmail.isChecked()) {
+                    formData.put("show_email", "true");
                 } else {
-                    formData.put("show_email","false");
+                    formData.put("show_email", "false");
                 }
                 break;
             case R.id.swShowCity:
-                if(swShowCity.isChecked()){
-                    formData.put("show_city","true");
+                if (swShowCity.isChecked()) {
+                    formData.put("show_city", "true");
                 } else {
-                    formData.put("show_city","false");
+                    formData.put("show_city", "false");
                 }
                 break;
             case R.id.swShowNeighborhood:
-                if(swShowNeighborhood.isChecked()){
-                    formData.put("show_neighborhood","true");
+                if (swShowNeighborhood.isChecked()) {
+                    formData.put("show_neighborhood", "true");
                 } else {
-                    formData.put("show_neighborhood","false");
+                    formData.put("show_neighborhood", "false");
                 }
                 break;
             case R.id.swShowPhone:
-                if(swShowPhone.isChecked()){
-                    formData.put("show_phone","true");
+                if (swShowPhone.isChecked()) {
+                    formData.put("show_phone", "true");
                 } else {
-                    formData.put("show_phone","false");
+                    formData.put("show_phone", "false");
                 }
                 break;
             case R.id.swShowWhatsapp:
-                if(swShowWhatsapp.isChecked()){
-                    formData.put("show_whatsapp","true");
+                if (swShowWhatsapp.isChecked()) {
+                    formData.put("show_whatsapp", "true");
                 } else {
-                    formData.put("show_whatsapp","false");
+                    formData.put("show_whatsapp", "false");
                 }
                 break;
         }

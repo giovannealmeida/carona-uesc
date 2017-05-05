@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(getResources().getString(R.string.item_menu_available_rides));
+        toolbar.setTitle(getResources().getString(R.string.title_fragment_available_rides));
         setSupportActionBar(toolbar);
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
@@ -192,6 +192,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_available_rides) {
             fab.showMenuButton(true);
+            toolbar.setTitle(getString(R.string.title_fragment_available_rides));
             showFragment(AvailableRidesFragment.newInstance());
         } else if (id == R.id.nav_my_profile) {
 
@@ -204,6 +205,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_ride_history) {
 
         } else if (id == R.id.nav_account_settings) {
+            toolbar.setTitle(getString(R.string.title_fragment_account));
             showFragment(AccountSettingsFragment.newInstance());
             fab.hideMenuButton(true);
         } else if (id == R.id.nav_donate) {

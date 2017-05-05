@@ -42,9 +42,6 @@
         <activity
             android:name=".activities.SignupActivity"
             android:label="@string/title_activity_signup" />
-        <activity
-            android:name=".activities.AccountActivity"
-            android:label="@string/title_activity_account" />
     </application>
 
 </manifest>

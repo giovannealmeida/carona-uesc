@@ -79,10 +79,8 @@
     <string name="title_activity_crop">Cortar imagem</string>
     <string name="title_activity_signup">Cadastro</string>
     <string name="lb_passenger">Passageiro</string>
-    <string name="title_activity_account">Configurações de conta</string>
+    <string name="title_fragment_account">Configurações de conta</string>
+    <string name="title_fragment_available_rides">Caronas disponíveis</string>
     <string name="hint_save">Salvar</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
