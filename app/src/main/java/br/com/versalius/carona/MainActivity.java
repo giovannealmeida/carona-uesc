@@ -7,13 +7,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,37 +22,24 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.VolleyError;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import br.com.versalius.carona.activities.AccountActivity;
 import br.com.versalius.carona.activities.LoginActivity;
 import br.com.versalius.carona.adapters.RideAdapter;
-import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
-import br.com.versalius.carona.models.Ride;
+import br.com.versalius.carona.fragments.AvailableRidesFragment;
 import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.models.Vehicle;
-import br.com.versalius.carona.network.NetworkHelper;
-import br.com.versalius.carona.network.ResponseCallback;
 import br.com.versalius.carona.utils.SessionHelper;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AvailableRidesFragment.OnRideListScrollListener {
 
-    private RecyclerView recyclerView;
     private FloatingActionMenu fab;
-    private TextView emptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +49,10 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getResources().getString(R.string.item_menu_available_rides));
         setSupportActionBar(toolbar);
-        emptyView = (TextView) findViewById(R.id.emptyView);
 
         setUpFabs();
-
         setUpDrawer(toolbar);
-
-        setUpRecycleView();
+        showFragment(AvailableRidesFragment.newInstance());
     }
 
     private void setUpDrawer(Toolbar toolbar) {
@@ -90,7 +74,7 @@ public class MainActivity extends AppCompatActivity
         ((TextView) navHeader.findViewById(R.id.tvUsername)).setText(user.getFullName());
         //Foto do usuário
         SimpleDraweeView draweeView = (SimpleDraweeView) navHeader.findViewById(R.id.ivProfile);
-        if(user.getPhotoUrl()!=null) {
+        if (user.getPhotoUrl() != null) {
             Uri uri = Uri.parse(user.getPhotoUrl());
             draweeView.setImageURI(uri);
         }
@@ -99,7 +83,7 @@ public class MainActivity extends AppCompatActivity
         draweeView.getHierarchy().setRoundingParams(roundingParams);
         TextView tvCurrentVehicle = (TextView) navHeader.findViewById(R.id.tvCurrentVehicle);
         Vehicle vehicle = user.getActiveCar();
-        if(vehicle != null) {
+        if (vehicle != null) {
             //Marca e modelo do carro
             tvCurrentVehicle.setText(vehicle.getBrand() + " - " + vehicle.getModel());
             if (vehicle.getType() == Vehicle.VEHICLE_TYPE_MOTO) {
@@ -133,66 +117,6 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
-    }
-
-    private void setUpRecycleView() {
-        recyclerView = (RecyclerView) findViewById(R.id.rvRides);
-        recyclerView.setHasFixedSize(true);
-
-        recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                if (dy > 0) {
-                    fab.hideMenuButton(true);
-                } else {
-                    fab.showMenuButton(true);
-                }
-            }
-        });
-
-        LinearLayoutManager manager = new LinearLayoutManager(this);
-        manager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(manager);
-
-        NetworkHelper.getInstance(this).getRidesByStatus(Ride.RIDE_OPEN, new ResponseCallback() {
-            @Override
-            public void onSuccess(String jsonStringResponse) {
-                try {
-                    JSONObject jsonObject = new JSONObject(jsonStringResponse);
-                    if (jsonObject.getBoolean("status")) {
-                        JSONArray jsonRides = jsonObject.getJSONArray("data");
-                        List<Ride> rides = new ArrayList<>();
-                        for (int i = 0; i < jsonRides.length(); i++) {
-                            rides.add(new Ride(jsonRides.getJSONObject(i)));
-                        }
-
-                        RideAdapter adapter = new RideAdapter(rides, MainActivity.this);
-                        adapter.setOnItemClickListener(new RecycleViewOnItemClickListener() {
-                            @Override
-                            public void onItemClick(View v, int position) {
-                                Toast.makeText(MainActivity.this, "click: " + ((RideAdapter) recyclerView.getAdapter()).getDataset().get(position).getId(), Toast.LENGTH_LONG).show();
-                            }
-                        });
-
-                        recyclerView.setAdapter(adapter);
-                    } else { //Não existem caronas
-                        emptyView.setText(jsonObject.getString("message"));
-                        emptyView.setVisibility(View.VISIBLE);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFail(VolleyError error) {
-                emptyView.setText("Não foi possível carregar as caronas. Tente novamente mais tarde.");
-                emptyView.setVisibility(View.VISIBLE);
-            }
-        });
-
     }
 
     @Override
@@ -239,7 +163,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_available_rides) {
-            // Handle the camera action
+            showFragment(AvailableRidesFragment.newInstance());
         } else if (id == R.id.nav_my_profile) {
 
         } else if (id == R.id.nav_my_ride) {
@@ -261,6 +185,23 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onScrollDown() {
+        fab.hideMenuButton(true);
+    }
+
+    @Override
+    public void onScrollUp() {
+        fab.showMenuButton(true);
+    }
+
+    private void showFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_main, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
     }
 
     public static class LogoutDialog extends DialogFragment {
@@ -299,7 +240,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                     )
-                    .setNeutralButton(getString(R.string.dialog_action_cancel),null)
+                    .setNeutralButton(getString(R.string.dialog_action_cancel), null)
                     .create();
         }
     }
