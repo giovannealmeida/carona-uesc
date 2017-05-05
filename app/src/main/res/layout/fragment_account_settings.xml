@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context="br.com.versalius.carona.MainActivity">
 
     <android.support.v4.widget.NestedScrollView
@@ -99,10 +97,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:textSize="18sp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginTop="4dp"
-                android:text="E-mail" />
+                android:text="E-mail"
+                android:textSize="18sp" />
 
             <android.support.v7.widget.SwitchCompat
                 android:id="@+id/swShowBirthday"
@@ -133,6 +131,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/lb_gender"
+                android:textColor="@android:color/black"
                 android:textSize="20sp" />
 
             <TextView
@@ -266,10 +265,10 @@
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:backgroundTint="@color/colorButton"
                 android:elevation="4dp"
-                android:text="@string/hint_save" />
+                android:text="@string/hint_save"
+                app:backgroundTint="@color/colorButton" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>
