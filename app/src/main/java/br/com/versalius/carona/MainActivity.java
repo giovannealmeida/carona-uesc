@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -28,19 +29,20 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
-import br.com.versalius.carona.activities.AccountActivity;
 import br.com.versalius.carona.activities.LoginActivity;
-import br.com.versalius.carona.adapters.RideAdapter;
 import br.com.versalius.carona.fragments.AccountSettingsFragment;
 import br.com.versalius.carona.fragments.AvailableRidesFragment;
+import br.com.versalius.carona.interfaces.OnMessageDeliveredListener;
 import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.models.Vehicle;
+import br.com.versalius.carona.utils.CustomSnackBar;
 import br.com.versalius.carona.utils.SessionHelper;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AvailableRidesFragment.OnRideListScrollListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AvailableRidesFragment.OnRideListScrollListener, OnMessageDeliveredListener {
 
     private FloatingActionMenu fab;
+    private CoordinatorLayout coordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity
         toolbar.setTitle(getResources().getString(R.string.item_menu_available_rides));
         setSupportActionBar(toolbar);
 
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         setUpFabs();
         setUpDrawer(toolbar);
         showFragment(AvailableRidesFragment.newInstance());
@@ -164,6 +167,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_available_rides) {
+            fab.showMenuButton(true);
             showFragment(AvailableRidesFragment.newInstance());
         } else if (id == R.id.nav_my_profile) {
 
@@ -177,6 +181,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_account_settings) {
             showFragment(AccountSettingsFragment.newInstance());
+            fab.hideMenuButton(true);
         } else if (id == R.id.nav_donate) {
 
         } else if (id == R.id.nav_send_email) {
@@ -203,6 +208,11 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.content_main, fragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
+    }
+
+    @Override
+    public void showMessage(String message, int duration, int type) {
+        CustomSnackBar.make(coordinatorLayout, message, duration, type).show();
     }
 
     public static class LogoutDialog extends DialogFragment {

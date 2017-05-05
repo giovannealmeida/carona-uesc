@@ -3,6 +3,7 @@ package br.com.versalius.carona.fragments;
 
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -12,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
@@ -54,8 +54,8 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import br.com.versalius.carona.R;
-import br.com.versalius.carona.activities.AccountActivity;
 import br.com.versalius.carona.activities.CropActivity;
+import br.com.versalius.carona.interfaces.OnMessageDeliveredListener;
 import br.com.versalius.carona.network.NetworkHelper;
 import br.com.versalius.carona.network.ResponseCallback;
 import br.com.versalius.carona.utils.CustomSnackBar;
@@ -66,6 +66,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static android.app.Activity.RESULT_OK;
 
 public class AccountSettingsFragment extends Fragment implements View.OnFocusChangeListener, TextWatcher, CompoundButton.OnCheckedChangeListener {
+
+    private OnMessageDeliveredListener listener;
 
     private TextInputLayout tilFirstName;
     private TextInputLayout tilLastName;
@@ -93,8 +95,6 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
     private SwitchCompat swShowNeighborhood;
     private SwitchCompat swShowPhone;
     private SwitchCompat swShowWhatsapp;
-
-    private CoordinatorLayout coordinatorLayout;
 
     private HashMap<String, String> formData;
 
@@ -301,9 +301,9 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
                                     progressHelper.dismiss();
                                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
                                     if(jsonObject.getBoolean("status")){
-                                        CustomSnackBar.make(coordinatorLayout, "Atualização realizada com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
+                                        listener.showMessage("Atualização realizada com sucesso",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.SUCCESS);
                                     } else {
-                                        CustomSnackBar.make(coordinatorLayout, "Falha ao realizar atualização", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
+                                        listener.showMessage("Falha ao realizar atualização",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -313,12 +313,12 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
                             @Override
                             public void onFail(VolleyError error) {
                                 progressHelper.dismiss();
-                                CustomSnackBar.make(coordinatorLayout, "Falha ao realizar cadastro", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
+                                listener.showMessage("Falha ao atualizar. Tente mais tarde!",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
                             }
                         });
                     }
                 } else {
-                    CustomSnackBar.make(coordinatorLayout, "Você está offline", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
+                    listener.showMessage("Você está offline",Snackbar.LENGTH_SHORT,CustomSnackBar.SnackBarType.ERROR);
                 }
             }
         });
@@ -586,9 +586,21 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnMessageDeliveredListener) {
+            listener = (OnMessageDeliveredListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnMessageDeliveredListener");
+        }
+    }
+
+    @Override
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+        listener = null;
     }
 
 
