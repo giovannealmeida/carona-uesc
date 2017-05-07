@@ -70,8 +70,8 @@ public class User implements Serializable{
             this.neighborhood = json.optString("u_neighborhood","");
             this.birthDate = Calendar.getInstance();
             this.birthDate.setTime(new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(json.optString("u_birth_date","")));
-            this.email = json.optString("email","");
-            this.password = json.optString("password","");
+            this.email = json.optString("u_email","");
+            this.password = json.optString("u_password","");
             if(!json.isNull("u_pic_path")) {
                 this.photoUrl = NetworkHelper.DOMINIO + json.getString("u_pic_path");
             }
@@ -96,9 +96,7 @@ public class User implements Serializable{
                 this.showWhatsapp = true;
             }
 
-        } catch (JSONException e){
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (JSONException | ParseException e){
             e.printStackTrace();
         }
     }

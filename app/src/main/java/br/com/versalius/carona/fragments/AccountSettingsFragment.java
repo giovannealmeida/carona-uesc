@@ -84,6 +84,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
 
     private EditText etFirstName;
     private EditText etLastName;
+    private EditText etEmail;
     private EditText etCity;
     private EditText etNeighborhood;
     private EditText etBirthday;
@@ -183,6 +184,8 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         etFirstName.setText(pref.load(PreferencesHelper.USER_FIRST_NAME));
         etLastName = (EditText) rootView.findViewById(R.id.etLastName);
         etLastName.setText(pref.load(PreferencesHelper.USER_LAST_NAME));
+        etEmail = (EditText) rootView.findViewById(R.id.etEmail);
+        etEmail.setText(pref.load(PreferencesHelper.USER_EMAIL));
         etCity = (EditText) rootView.findViewById(R.id.etCity);
         etCity.setText(pref.load(PreferencesHelper.USER_CITY));
         etNeighborhood = (EditText) rootView.findViewById(R.id.etNeighborhood);
