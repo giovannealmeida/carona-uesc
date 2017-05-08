@@ -42,6 +42,9 @@
         <activity
             android:name=".activities.SignupActivity"
             android:label="@string/title_activity_signup" />
+        <activity
+            android:name=".activities.PasswordRecoveryActivity"
+            android:label="@string/title_activity_recovery" />
     </application>
 
 </manifest>

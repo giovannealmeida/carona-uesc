@@ -5,7 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -33,6 +32,7 @@ public class NetworkHelper {
     private final String API = "api/";
     private final String LOGIN = API+"UserService/login";
     private final String SIGNUP = API+"UserService/signup";
+    private final String RECOVER_PASSWORD = API+"UserService/forgot_password_send_hash";
     private final String UPDATE = API+"UserService/update";
     private final String CHECK_EMAIL = API+"UserService/email_check";
     private final String GET_RIDES = API+"RideService/get_by_status";
@@ -72,6 +72,16 @@ public class NetworkHelper {
                 params,
                 TAG,
                 DOMINIO + SIGNUP,
+                callback);
+    }
+
+    public void recoverPassword(String email, ResponseCallback callback) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("email", email);
+        execute(Request.Method.POST,
+                params,
+                TAG,
+                DOMINIO + RECOVER_PASSWORD,
                 callback);
     }
 

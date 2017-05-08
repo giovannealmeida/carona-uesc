@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,12 +40,20 @@ public class LoginActivity extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
     private TextView tvMessage;
+    private TextView tvForgotPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         tvMessage = (TextView) findViewById(R.id.tvMessage);
+        tvForgotPassword = (TextView) findViewById(R.id.tvForgotPassword);
+        tvForgotPassword.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this,PasswordRecoveryActivity.class));
+            }
+        });
 
         if(getIntent().getStringExtra("message")!= null) {
             tvMessage.setText(getIntent().getStringExtra("message"));

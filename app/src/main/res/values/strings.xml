@@ -7,6 +7,15 @@
     <!--Toolbar menu-->
     <string name="action_logout">Sair</string>
 
+    <!--Activities adn fragments titles-->
+    <string name="title_activity_recovery">Recuperação de senha</string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_signup">Cadastro</string>
+    <string name="title_activity_crop">Cortar imagem</string>
+    <string name="title_activity_signup">Cadastro</string>
+    <string name="title_fragment_account">Configurações de conta</string>
+    <string name="title_fragment_available_rides">Caronas disponíveis</string>
+
     <!--Drawer menu-->
     <string name="item_menu_available_rides">Caronas disponíveis</string>
     <string name="item_menu_my_profile">Meu perfil</string>
@@ -18,7 +27,6 @@
     <string name="item_menu_donate">Doação</string>
     <string name="item_menu_send_email">Críticas e sugestões</string>
     <string name="help_us">Ajude-nos</string>
-    <string name="title_activity_login">Login</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -35,7 +43,9 @@
 
     <!--Dialogs-->
     <string name="dialog_action_yes">Sim</string>
+    <string name="dialog_action_no">Não</string>
     <string name="dialog_action_cancel">Cancelar</string>
+    <string name="dialog_action_ok">OK</string>
     <string name="dialog_message_logout">Tem certeza que deseja sair?</string>
     <string name="dialog_title_permission">Permissão requerida</string>
     <string name="dialog_permission_agree_button">Aceitar</string>
@@ -58,7 +68,6 @@
     <string name="hint_whatsapp">Whatsapp</string>
     <string name="hint_singup">Cadastrar!</string>
     <string name="hint_neigborhood">Bairro</string>
-    <string name="title_signup">Cadastro</string>
 
     <!--Errors-->
     <string name="err_msg_empty_name">Insira um nome</string>
@@ -77,11 +86,9 @@
     <string name="err_msg_invalid_email">E-mail inválido</string>
     <string name="err_msg_existing_email">Este e-mail já está cadastrado</string>
     <string name="err_msg_server_fail">Falha ao verificar e-mail. Tente mais tarde.</string>
-    <string name="title_activity_crop">Cortar imagem</string>
-    <string name="title_activity_signup">Cadastro</string>
     <string name="lb_passenger">Passageiro</string>
-    <string name="title_fragment_account">Configurações de conta</string>
-    <string name="title_fragment_available_rides">Caronas disponíveis</string>
     <string name="hint_save">Salvar</string>
+    <string name="action_recovery">Recuperar</string>
+    <string name="dialog_message_recovey_email_sent_confirmation">Um e-mail de redefinição de senha foi enviado</string>
 
 </resources>

@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                             }
                     )
-                    .setNeutralButton(getString(R.string.dialog_action_cancel), null)
+                    .setNegativeButton(getString(R.string.dialog_action_no), null)
                     .create();
         }
     }
