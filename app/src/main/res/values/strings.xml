@@ -90,5 +90,8 @@
     <string name="hint_save">Salvar</string>
     <string name="action_recovery">Recuperar</string>
     <string name="dialog_message_recovey_email_sent_confirmation">Um e-mail de redefinição de senha foi enviado</string>
+    <string name="no_ride_available">Não existem caronas disponíveis no momento.</string>
+    <string name="failed_load_rides">Não foi possível carregar as caronas. Tente novamente mais tarde.</string>
+    <string name="failed_load_more_rides">Não foi possível carregar mais caronas. Tente novamente mais tarde.</string>
 
 </resources>

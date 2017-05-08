@@ -15,7 +15,7 @@ public class ProgressDialogHelper {
         this.context = context;
     }
 
-    public void createProgressSpinner(String title, String message, boolean indeterminate, boolean cancelable) {
+    public void showProgressSpinner(String title, String message, boolean indeterminate, boolean cancelable) {
         progressDialog = ProgressDialog.show(context, title, message, indeterminate, cancelable);
     }
 

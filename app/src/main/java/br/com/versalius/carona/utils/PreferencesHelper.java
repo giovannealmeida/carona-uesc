@@ -27,6 +27,8 @@ public class PreferencesHelper {
     public static final String USER_PHONE = "user_phone";
     public static final String USER_WHATSAPP = "user_whatsapp";
 
+    public static final String USER_CURRENT_RIDE_ID = "currentRideId";
+
     public static final String PREF_SHOW_EMAIL = "show_email";
     public static final String PREF_SHOW_BIRTHDAY = "show_birthday";
     public static final String PREF_SHOW_CITY = "show_city";

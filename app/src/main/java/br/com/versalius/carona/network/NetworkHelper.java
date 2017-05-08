@@ -27,16 +27,16 @@ public class NetworkHelper {
     private static Context context;
     private RequestQueue requestQueue;
 
-//    private final String DOMINIO = "http://giog.000webhostapp.com/"; // Remoto
+    //    private final String DOMINIO = "http://giog.000webhostapp.com/"; // Remoto
     public static final String DOMINIO = "http://10.1.1.105/caronauesc-web/"; // Repo
     private final String API = "api/";
-    private final String LOGIN = API+"UserService/login";
-    private final String SIGNUP = API+"UserService/signup";
-    private final String RECOVER_PASSWORD = API+"UserService/forgot_password_send_hash";
-    private final String UPDATE = API+"UserService/update";
-    private final String CHECK_EMAIL = API+"UserService/email_check";
-    private final String GET_RIDES = API+"RideService/get_by_status";
-    private final String GET_USER = API+"UserService/get_user_by_id";
+    private final String LOGIN = API + "UserService/login";
+    private final String SIGNUP = API + "UserService/signup";
+    private final String RECOVER_PASSWORD = API + "UserService/forgot_password_send_hash";
+    private final String UPDATE = API + "UserService/update";
+    private final String CHECK_EMAIL = API + "UserService/email_check";
+    private final String GET_RIDES = API + "RideService/get_by_status";
+    private final String GET_USER = API + "UserService/get_user_by_id";
 
     private NetworkHelper(Context context) {
         this.context = context;
@@ -87,7 +87,8 @@ public class NetworkHelper {
 
     /**
      * Salva as preferêncuas de conta
-     * @param params - Dados a serem salvos
+     *
+     * @param params   - Dados a serem salvos
      * @param callback - Callback de resposta do servidor
      */
     public void savePreferences(HashMap<String, String> params, ResponseCallback callback) {
@@ -110,7 +111,7 @@ public class NetworkHelper {
      * Se um email que não existe no banco e um id de usuário que existe são passados, retorna 'false'
      * Se um email que existe no banco e um id de usuário que não existe são passados, retorna 'true'
      *
-     * @param email   - Email e id do usuário
+     * @param email    - Email e id do usuário
      * @param callback
      */
     public void emailExists(String email, ResponseCallback callback) {
@@ -124,13 +125,19 @@ public class NetworkHelper {
                 callback);
     }
 
-    public void getRidesByStatus(int status, ResponseCallback callback) {
+    public void getRidesByStatus(int status, int limit, int offset, ResponseCallback callback) {
         HashMap<String, String> params = new HashMap<>();
         params.put("status", Integer.toString(status));
+        if (limit > 0) {
+            params.put("limit", Integer.toString(limit));
+            if (offset > 0) {
+                params.put("offset", Integer.toString(offset));
+            }
+        }
         execute(Request.Method.GET,
                 null,
                 TAG,
-                buildGetURL(DOMINIO + GET_RIDES,params),
+                buildGetURL(DOMINIO + GET_RIDES, params),
                 callback);
     }
 
@@ -140,7 +147,7 @@ public class NetworkHelper {
         execute(Request.Method.GET,
                 null,
                 TAG,
-                buildGetURL(DOMINIO + GET_USER,params),
+                buildGetURL(DOMINIO + GET_USER, params),
                 callback);
     }
 

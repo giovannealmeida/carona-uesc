@@ -1,8 +1,8 @@
 package br.com.versalius.carona.fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,19 +21,26 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.versalius.carona.MainActivity;
 import br.com.versalius.carona.R;
 import br.com.versalius.carona.adapters.RideAdapter;
+import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
 import br.com.versalius.carona.models.Ride;
 import br.com.versalius.carona.network.NetworkHelper;
 import br.com.versalius.carona.network.ResponseCallback;
+import br.com.versalius.carona.utils.CustomSnackBar;
+import br.com.versalius.carona.utils.ProgressDialogHelper;
 
 public class AvailableRidesFragment extends Fragment {
 
-    private OnRideListScrollListener mListener;
+    //Listeners
+    private MessageDeliveredListener messageDeliveredListener; //Cria Snacks na MainActivity
+    private OnRideListScrollListener mListener; //Seta o comportamento do FAB na MainActivity
+
     private RecyclerView recyclerView;
     private TextView emptyView;
+    private ArrayList<Ride> rides;
+    private ProgressDialogHelper dialogHelper;
 
     public static AvailableRidesFragment newInstance() {
         return new AvailableRidesFragment();
@@ -43,6 +50,7 @@ public class AvailableRidesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_available_rides, container, false);
+        dialogHelper = new ProgressDialogHelper(getActivity());
         emptyView = (TextView) rootView.findViewById(R.id.emptyView);
 
         setUpRecycleView(rootView);
@@ -57,13 +65,21 @@ public class AvailableRidesFragment extends Fragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
+                //Seta o comportamento do FAB na MainActivity
                 if (mListener != null) {
                     if (dy > 0) {
                         mListener.onScrollDown();
                     } else {
                         mListener.onScrollUp();
                     }
+                }
+
+                //Carrega mais itens na lista
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                RideAdapter adapter = (RideAdapter) recyclerView.getAdapter();
+
+                if (rides.size() == layoutManager.findLastCompletelyVisibleItemPosition()+1) {
+                    loadMoreRides(adapter);
                 }
             }
         });
@@ -72,14 +88,16 @@ public class AvailableRidesFragment extends Fragment {
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
 
-        NetworkHelper.getInstance(getActivity()).getRidesByStatus(Ride.RIDE_OPEN, new ResponseCallback() {
+        dialogHelper.showProgressSpinner("", "", true, false);
+        NetworkHelper.getInstance(getActivity()).getRidesByStatus(Ride.RIDE_OPEN, 0, 0, new ResponseCallback() {
             @Override
             public void onSuccess(String jsonStringResponse) {
                 try {
+                    dialogHelper.dismiss();
                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
                     if (jsonObject.getBoolean("status")) {
                         JSONArray jsonRides = jsonObject.getJSONArray("data");
-                        List<Ride> rides = new ArrayList<>();
+                        rides = new ArrayList<>();
                         for (int i = 0; i < jsonRides.length(); i++) {
                             rides.add(new Ride(jsonRides.getJSONObject(i)));
                         }
@@ -93,6 +111,7 @@ public class AvailableRidesFragment extends Fragment {
                         });
 
                         recyclerView.setAdapter(adapter);
+
                     } else { //Não existem caronas
                         emptyView.setText(jsonObject.getString("message"));
                         emptyView.setVisibility(View.VISIBLE);
@@ -104,8 +123,36 @@ public class AvailableRidesFragment extends Fragment {
 
             @Override
             public void onFail(VolleyError error) {
-                emptyView.setText("Não foi possível carregar as caronas. Tente novamente mais tarde.");
+                dialogHelper.dismiss();
+                emptyView.setText(R.string.failed_load_rides);
                 emptyView.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void loadMoreRides(final RideAdapter adapter) {
+        dialogHelper.showProgressSpinner("","",true,false);
+        NetworkHelper.getInstance(getActivity()).getRidesByStatus(Ride.RIDE_OPEN, 10, rides.size(), new ResponseCallback() {
+            @Override
+            public void onSuccess(String jsonStringResponse) {
+                try {
+                    dialogHelper.dismiss();
+                    JSONObject jsonObject = new JSONObject(jsonStringResponse);
+                    if (jsonObject.getBoolean("status")) {
+                        JSONArray jsonRides = jsonObject.getJSONArray("data");
+                        for (int i = 0; i < jsonRides.length(); i++) {
+                            adapter.addItemList(new Ride(jsonRides.getJSONObject(i)));
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFail(VolleyError error) {
+                dialogHelper.dismiss();
+                messageDeliveredListener.onMessageDelivered(getString(R.string.failed_load_rides), Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR);
             }
         });
     }
@@ -119,12 +166,20 @@ public class AvailableRidesFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnRideListScrollListener");
         }
+
+        if (context instanceof MessageDeliveredListener) {
+            messageDeliveredListener = (MessageDeliveredListener) context;
+        }else {
+            throw new RuntimeException(context.toString()
+                    + " must implement MessageDeliveredListener");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        messageDeliveredListener = null;
     }
 
     /**
@@ -139,6 +194,7 @@ public class AvailableRidesFragment extends Fragment {
      */
     public interface OnRideListScrollListener {
         void onScrollDown();
+
         void onScrollUp();
     }
 }

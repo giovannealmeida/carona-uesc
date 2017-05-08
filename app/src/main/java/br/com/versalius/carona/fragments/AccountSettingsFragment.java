@@ -308,7 +308,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
                 final ProgressDialogHelper progressHelper = new ProgressDialogHelper(getActivity());
                 if (NetworkHelper.isOnline(getActivity())) {
                     if (isValidForm()) {
-                        progressHelper.createProgressSpinner("Aguarde", "Salvando", true, false);
+                        progressHelper.showProgressSpinner("Aguarde", "Salvando", true, false);
                         NetworkHelper.getInstance(getActivity()).savePreferences(formData, new ResponseCallback() {
                             @Override
                             public void onSuccess(String jsonStringResponse) {

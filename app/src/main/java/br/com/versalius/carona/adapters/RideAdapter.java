@@ -24,6 +24,8 @@ import br.com.versalius.carona.models.Ride;
 import br.com.versalius.carona.models.Vehicle;
 import br.com.versalius.carona.utils.PreferencesHelper;
 
+import static br.com.versalius.carona.utils.PreferencesHelper.USER_CURRENT_RIDE_ID;
+
 /**
  * Created by Giovanne on 03/12/2016.
  */
@@ -88,7 +90,7 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
 //                    holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary));
                     holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorSecondary));
                     try {
-                        PreferencesHelper.getInstance(context).save("currentRideId", String.valueOf(list.get(position).getId()));
+                        PreferencesHelper.getInstance(context).save(USER_CURRENT_RIDE_ID, String.valueOf(list.get(position).getId()));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -98,7 +100,7 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
                     holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorButton));
 
                     try {
-                        PreferencesHelper.getInstance(context).save("currentRideId", "");
+                        PreferencesHelper.getInstance(context).remove(USER_CURRENT_RIDE_ID);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -110,7 +112,12 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
     }
 
     private boolean isInRide(int rideId) {
-        return PreferencesHelper.getInstance(context).load("currentRideId").equals(String.valueOf(rideId));
+        return PreferencesHelper.getInstance(context).load(USER_CURRENT_RIDE_ID).equals(String.valueOf(rideId));
+    }
+
+    public void addItemList(Ride ride){
+        list.add(ride);
+        notifyItemInserted(list.size()-1);
     }
 
     @Override
