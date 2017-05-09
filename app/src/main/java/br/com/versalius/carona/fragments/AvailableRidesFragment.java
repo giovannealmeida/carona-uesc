@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ public class AvailableRidesFragment extends Fragment {
     private OnRideListScrollListener mListener; //Seta o comportamento do FAB na MainActivity
 
     private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private TextView emptyView;
     private ArrayList<Ride> rides;
     private ProgressDialogHelper dialogHelper;
@@ -60,6 +62,13 @@ public class AvailableRidesFragment extends Fragment {
     private void setUpRecycleView(View rootView) {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.rvRides);
         recyclerView.setHasFixedSize(true);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getRides();
+            }
+        });
 
         recyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -89,6 +98,10 @@ public class AvailableRidesFragment extends Fragment {
         recyclerView.setLayoutManager(manager);
 
         dialogHelper.showProgressSpinner("", "", true, false);
+        getRides();
+    }
+
+    private void getRides(){
         NetworkHelper.getInstance(getActivity()).getRidesByStatus(Ride.RIDE_OPEN, 0, 0, new ResponseCallback() {
             @Override
             public void onSuccess(String jsonStringResponse) {
@@ -116,6 +129,9 @@ public class AvailableRidesFragment extends Fragment {
                         emptyView.setText(jsonObject.getString("message"));
                         emptyView.setVisibility(View.VISIBLE);
                     }
+                    if(swipeRefreshLayout.isRefreshing()){
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -126,6 +142,9 @@ public class AvailableRidesFragment extends Fragment {
                 dialogHelper.dismiss();
                 emptyView.setText(R.string.failed_load_rides);
                 emptyView.setVisibility(View.VISIBLE);
+                if(swipeRefreshLayout.isRefreshing()){
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
     }
