@@ -32,6 +32,7 @@ import com.github.clans.fab.FloatingActionMenu;
 import br.com.versalius.carona.activities.LoginActivity;
 import br.com.versalius.carona.fragments.AccountSettingsFragment;
 import br.com.versalius.carona.fragments.AvailableRidesFragment;
+import br.com.versalius.carona.fragments.ChangeVehicleFragment;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
 import br.com.versalius.carona.models.User;
@@ -191,7 +192,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_available_rides) {
-            fab.showMenuButton(true);
+//            fab.showMenuButton(true);
             toolbar.setTitle(getString(R.string.title_fragment_available_rides));
             showFragment(AvailableRidesFragment.newInstance());
         } else if (id == R.id.nav_my_profile) {
@@ -199,7 +200,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_my_ride) {
 
         } else if (id == R.id.nav_change_vehicle) {
-
+            toolbar.setTitle(getString(R.string.title_fragment_change_vehicle));
+            showFragment(ChangeVehicleFragment.newInstance());
         } else if (id == R.id.nav_my_evaluations) {
 
         } else if (id == R.id.nav_ride_history) {
@@ -207,7 +209,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_account_settings) {
             toolbar.setTitle(getString(R.string.title_fragment_account));
             showFragment(AccountSettingsFragment.newInstance());
-            fab.hideMenuButton(true);
+//            fab.hideMenuButton(true);
         } else if (id == R.id.nav_donate) {
 
         } else if (id == R.id.nav_send_email) {

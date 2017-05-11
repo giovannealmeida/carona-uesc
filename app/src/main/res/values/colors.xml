@@ -7,6 +7,7 @@
     <color name="colorAccentLight">#a5d6a7</color>
 
     <color name="colorButton">#2196f3</color>
+    <color name="colorButtonDisabled">#ddd</color>
     <color name="err_msg">#D50000</color>
 
     <!--SnackBar-->

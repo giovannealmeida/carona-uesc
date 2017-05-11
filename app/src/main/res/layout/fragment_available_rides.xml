@@ -5,10 +5,41 @@
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ded"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="br.com.versalius.carona.MainActivity"
-    tools:showIn="@layout/app_bar_main">
+    tools:context="br.com.versalius.carona.MainActivity">
+
+    <LinearLayout
+        android:id="@+id/emptyView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_empty_ride_list" />
+
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Não existem caronas ainda"
+            android:textColor="#b9b9b9"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:drawableBottom="@drawable/ic_swipe_to_refresh"
+            android:text="Puxe pra atualizar"
+            android:textColor="#b9b9b9"
+            android:textSize="20sp" />
+    </LinearLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -21,11 +52,4 @@
             android:layout_height="wrap_content" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <TextView
-        android:id="@+id/emptyView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Não existem caronas"
-        android:textSize="40sp"
-        android:visibility="gone" />
 </RelativeLayout>

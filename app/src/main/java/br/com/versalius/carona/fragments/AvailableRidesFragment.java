@@ -40,7 +40,7 @@ public class AvailableRidesFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private TextView emptyView;
+    private View emptyView;
     private ArrayList<Ride> rides;
     private ProgressDialogHelper dialogHelper;
 
@@ -53,7 +53,7 @@ public class AvailableRidesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_available_rides, container, false);
         dialogHelper = new ProgressDialogHelper(getActivity());
-        emptyView = (TextView) rootView.findViewById(R.id.emptyView);
+        emptyView = rootView.findViewById(R.id.emptyView);
 
         setUpRecycleView(rootView);
         return rootView;
@@ -62,10 +62,12 @@ public class AvailableRidesFragment extends Fragment {
     private void setUpRecycleView(View rootView) {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.rvRides);
         recyclerView.setHasFixedSize(true);
+
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                emptyView.setVisibility(View.GONE);
                 getRides();
             }
         });
@@ -97,7 +99,7 @@ public class AvailableRidesFragment extends Fragment {
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
 
-        dialogHelper.showProgressSpinner("", "", true, false);
+        dialogHelper.showProgressSpinner("Aguarde", "Carregando caronas", true, false);
         getRides();
     }
 
@@ -124,10 +126,12 @@ public class AvailableRidesFragment extends Fragment {
                         });
 
                         recyclerView.setAdapter(adapter);
+                        recyclerView.setVisibility(View.VISIBLE);
 
                     } else { //Não existem caronas
-                        emptyView.setText(jsonObject.getString("message"));
+                        ((TextView)emptyView.findViewById(R.id.tvEmpty)).setText(jsonObject.getString("message"));
                         emptyView.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
                     }
                     if(swipeRefreshLayout.isRefreshing()){
                         swipeRefreshLayout.setRefreshing(false);
@@ -140,8 +144,9 @@ public class AvailableRidesFragment extends Fragment {
             @Override
             public void onFail(VolleyError error) {
                 dialogHelper.dismiss();
-                emptyView.setText(R.string.failed_load_rides);
+                ((TextView)emptyView.findViewById(R.id.tvEmpty)).setText(R.string.failed_load_rides);
                 emptyView.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
                 if(swipeRefreshLayout.isRefreshing()){
                     swipeRefreshLayout.setRefreshing(false);
                 }

@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import br.com.versalius.carona.models.User;
+import br.com.versalius.carona.models.Vehicle;
 
 /**
  * Created by Giovanne on 30/06/2016.
@@ -66,7 +67,18 @@ public class SessionHelper {
     }
 
     public String getUserId() {
-        return PreferencesHelper.getInstance(context).load(PreferencesHelper.USER_ID);
+//        return PreferencesHelper.getInstance(context).load(PreferencesHelper.USER_ID);
+        String userId = "";
+        SQLiteDatabase db = new DBHelper(context).getDatabase();
+        Cursor cursor = db.query(DBHelper.TBL_SESSION, new String[]{"user_id"}, null, null, null, null, null, null);
+
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+                userId = String.valueOf(cursor.getInt(0));
+        }
+        cursor.close();
+
+        return userId;
     }
 
     public String getUserEmail() {
@@ -91,6 +103,35 @@ public class SessionHelper {
             values.put("password", user.getPassword());
 
             dbHelper.getDatabase().insert(DBHelper.TBL_SESSION, null, values);
+
+            //Salva no banco os veículos
+            if (user.getVehicles() != null) {
+                for (Vehicle vehicle : user.getVehicles()) {
+                    values = new ContentValues();
+                    values.put("id", vehicle.getId());
+                    values.put("is_default",vehicle.isDefault()?1:0);
+                    values.put("type", vehicle.getType());
+                    values.put("model", vehicle.getModel());
+                    values.put("brand", vehicle.getBrand());
+                    values.put("air", vehicle.hasAir());
+                    values.put("num_doors", vehicle.getNumDoors());
+                    values.put("num_sits", vehicle.getNumSits());
+                    values.put("plate", vehicle.getPlate());
+                    values.put("color_name", vehicle.getColorName());
+                    values.put("color_hex", vehicle.getColorHex());
+                    values.put("main_pic_url", vehicle.getMainPhotoUrl());
+
+                    dbHelper.getDatabase().insert(DBHelper.TBL_VEHICLE, null, values);
+                    if (vehicle.getGallery() != null) {
+                        values = new ContentValues();
+                        for (String picUrl : vehicle.getGallery()) {
+                            values.put("vehicle_id", vehicle.getId());
+                            values.put("pic_url", picUrl);
+                            dbHelper.getDatabase().insert(DBHelper.TBL_VEHICLE_GALLERY, null, values);
+                        }
+                    }
+                }
+            }
 
             //Salva no Shared Preferences dados de acesso rápido
 
@@ -120,6 +161,7 @@ public class SessionHelper {
 
     /**
      * Atualiza dados de seção já existentes
+     *
      * @param user - Usuário a ser atualizado
      */
     public void updateUser(User user) {
@@ -130,7 +172,7 @@ public class SessionHelper {
             values.put("email", user.getEmail());
             values.put("password", user.getPassword());
 
-            dbHelper.getDatabase().update(DBHelper.TBL_SESSION, values, "user_id="+user.getId(),null);
+            dbHelper.getDatabase().update(DBHelper.TBL_SESSION, values, "user_id=" + user.getId(), null);
 
             //Salva no Shared Preferences dados de acesso rápido
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_FIRST_NAME, user.getFirstName());

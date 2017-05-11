@@ -22,7 +22,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SessionHelper session = new SessionHelper(this);
+        final SessionHelper session = new SessionHelper(this);
         if(session.isLogged()){
 
             NetworkHelper.getInstance(this).getUserById(session.getUserId(), new ResponseCallback() {
@@ -44,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
                             intent.putExtra("message",jsonObject.getString("message"));
                             startActivity(intent);
                         }
-
+                        finish();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -52,9 +52,16 @@ public class SplashActivity extends AppCompatActivity {
 
                 @Override
                 public void onFail(VolleyError error) {
+                    //Força logout
+                    session.logout();
                     Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-                    intent.putExtra("message","Não foi possível realizar login. Tente novamente mais tarde.");
+                    if(NetworkHelper.isOnline(getApplicationContext())) {
+                        intent.putExtra("message", "Não foi possível realizar login. Tente novamente mais tarde.");
+                    } else {
+                        intent.putExtra("message", "Você está offline!");
+                    }
                     startActivity(intent);
+                    finish();
                 }
             });
 
@@ -63,6 +70,5 @@ public class SplashActivity extends AppCompatActivity {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
-        finish();
     }
 }
