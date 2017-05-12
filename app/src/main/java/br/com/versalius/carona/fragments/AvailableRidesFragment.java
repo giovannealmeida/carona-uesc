@@ -20,7 +20,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import br.com.versalius.carona.R;
 import br.com.versalius.carona.adapters.RideAdapter;
@@ -99,7 +98,7 @@ public class AvailableRidesFragment extends Fragment {
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
 
-        dialogHelper.showProgressSpinner("Aguarde", "Carregando caronas", true, false);
+        dialogHelper.showProgressSpinner(getString(R.string.progress_wait), getString(R.string.progress_loading_rides), false, false);
         getRides();
     }
 
@@ -155,7 +154,7 @@ public class AvailableRidesFragment extends Fragment {
     }
 
     private void loadMoreRides(final RideAdapter adapter) {
-        dialogHelper.showProgressSpinner("","",true,false);
+        dialogHelper.showProgressSpinner(getString(R.string.progress_wait), getString(R.string.progress_loading_rides), false, false);
         NetworkHelper.getInstance(getActivity()).getRidesByStatus(Ride.RIDE_OPEN, 10, rides.size(), new ResponseCallback() {
             @Override
             public void onSuccess(String jsonStringResponse) {

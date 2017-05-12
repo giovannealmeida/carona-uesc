@@ -44,10 +44,10 @@ public class SplashActivity extends AppCompatActivity {
                             intent.putExtra("message",jsonObject.getString("message"));
                             startActivity(intent);
                         }
-                        finish();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    finish();
                 }
 
                 @Override
@@ -69,6 +69,7 @@ public class SplashActivity extends AppCompatActivity {
         } else {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
+            finish();
         }
     }
 }
