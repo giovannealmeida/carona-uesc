@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -100,7 +99,7 @@ public class AvailableRidesFragment extends Fragment {
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(manager);
 
-        dialogHelper.showProgressSpinner(getString(R.string.progress_wait), getString(R.string.progress_loading_rides), false, false);
+        dialogHelper.showSpinner(getString(R.string.progress_wait), getString(R.string.progress_loading_rides), false, false);
         getRides();
     }
 
@@ -162,7 +161,7 @@ public class AvailableRidesFragment extends Fragment {
     }
 
     private void loadMoreRides(final RideAdapter adapter) {
-        dialogHelper.showProgressSpinner(getString(R.string.progress_wait), getString(R.string.progress_loading_rides), false, false);
+        dialogHelper.showSpinner(getString(R.string.progress_wait), getString(R.string.progress_loading_rides), false, false);
         NetworkHelper.getInstance(getActivity()).getRidesByStatus(Ride.RIDE_OPEN, 10, rides.size(), new ResponseCallback() {
             @Override
             public void onSuccess(String jsonStringResponse) {

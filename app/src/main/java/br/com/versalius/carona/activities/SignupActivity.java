@@ -215,7 +215,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnFocusCha
                 final ProgressDialogHelper progressHelper = new ProgressDialogHelper(SignupActivity.this);
                 if (NetworkHelper.isOnline(SignupActivity.this)) {
                     if (isValidForm()) {
-                        progressHelper.showProgressSpinner("Aguarde", "Realizando cadastro", true, false);
+                        progressHelper.showSpinner("Aguarde", "Realizando cadastro", true, false);
                         NetworkHelper.getInstance(SignupActivity.this).doSignUp(formData, new ResponseCallback() {
                             @Override
                             public void onSuccess(String jsonStringResponse) {

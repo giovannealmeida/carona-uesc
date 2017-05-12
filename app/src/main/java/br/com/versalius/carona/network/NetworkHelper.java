@@ -27,8 +27,8 @@ public class NetworkHelper {
     private static Context context;
     private RequestQueue requestQueue;
 
-        public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
-//    public static final String DOMINIO = "http://10.1.1.109/caronauesc-web/"; // Repo
+//        public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
+    public static final String DOMINIO = "http://10.1.1.109/caronauesc-web/"; // Repo
     private final String API = "api/";
     private final String LOGIN = API + "UserService/login";
     private final String SIGNUP = API + "UserService/signup";
@@ -37,6 +37,7 @@ public class NetworkHelper {
     private final String CHECK_EMAIL = API + "UserService/email_check";
     private final String GET_RIDES = API + "RideService/get_by_status";
     private final String GET_USER = API + "UserService/get_user_by_id";
+    private final String UPDATE_DEFAULT_VEHICLE = API + "VehicleService/update_default";
 
     private NetworkHelper(Context context) {
         this.context = context;
@@ -148,6 +149,17 @@ public class NetworkHelper {
                 null,
                 TAG,
                 buildGetURL(DOMINIO + GET_USER, params),
+                callback);
+    }
+
+    public void updateDefaultVehicle(String lastDefaultId,String newDefaultId, ResponseCallback callback) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("last_default_id", lastDefaultId);
+        params.put("new_default_id", newDefaultId);
+        execute(Request.Method.POST,
+                params,
+                TAG,
+                DOMINIO + UPDATE_DEFAULT_VEHICLE,
                 callback);
     }
 

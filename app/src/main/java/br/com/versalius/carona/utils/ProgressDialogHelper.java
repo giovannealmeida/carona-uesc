@@ -15,11 +15,11 @@ public class ProgressDialogHelper {
         this.context = context;
     }
 
-    public void showProgressSpinner(String title, String message, boolean indeterminate, boolean cancelable) {
+    public void showSpinner(String title, String message, boolean indeterminate, boolean cancelable) {
         progressDialog = ProgressDialog.show(context, title, message, indeterminate, cancelable);
     }
 
-    public void createProgressBar(String title, String message, int maxProgress, boolean cancelable) {
+    public void showProgressBar(String title, String message, int maxProgress, boolean cancelable) {
         progressDialog = new ProgressDialog(context);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setTitle(title);
