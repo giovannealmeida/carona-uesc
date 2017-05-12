@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -63,6 +64,7 @@ public class AvailableRidesFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -137,6 +139,12 @@ public class AvailableRidesFragment extends Fragment {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    ((TextView)emptyView.findViewById(R.id.tvEmpty)).setText(R.string.the_server_is_not_okay);
+                    emptyView.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    if(swipeRefreshLayout.isRefreshing()){
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                 }
             }
 

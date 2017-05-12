@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,11 +43,21 @@ public class ChangeVehicleFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_change_vehicle, container, false);
         emptyView = rootView.findViewById(R.id.emptyView);
         content = rootView.findViewById(R.id.content);
-        setUpViews(rootView);
+
+        LinearLayout llAddVehicle = (LinearLayout) rootView.findViewById(R.id.llAddVehicle);
+        llAddVehicle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity(),"Click",Toast.LENGTH_LONG).show();
+            }
+        });
+
+        setUpRecyclerView(rootView);
         return rootView;
     }
 
-    private void setUpViews(View rootView) {
+    private void setUpRecyclerView(View rootView) {
+
         rvVehicles = (RecyclerView) rootView.findViewById(R.id.rvVehicles);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setOrientation(LinearLayoutManager.VERTICAL);

@@ -94,8 +94,9 @@
     <string name="failed_load_rides">Não foi possível carregar as caronas. Tente novamente mais tarde.</string>
     <string name="failed_load_more_rides">Não foi possível carregar mais caronas. Tente novamente mais tarde.</string>
     <string name="title_fragment_change_vehicle">Alterar veículo</string>
-    <string name="action_add_vehicle">+ Adicionar veículo</string>
+    <string name="action_add_vehicle">Adicionar veículo</string>
     <string name="progress_wait">Aguarde</string>
     <string name="progress_loading_rides">Carregando caronas</string>
+    <string name="the_server_is_not_okay">O servidor se comportou de uma forma estranha</string>
 
 </resources>

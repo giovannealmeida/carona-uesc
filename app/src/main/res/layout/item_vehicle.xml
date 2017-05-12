@@ -43,7 +43,7 @@
             android:background="@android:color/transparent"
             android:scaleType="fitXY"
             android:src="@drawable/ic_check_circle"
-            android:tint="@color/colorAccent"
+            android:tint="@color/colorButton"
             android:visibility="gone" />
 
         <ImageButton
