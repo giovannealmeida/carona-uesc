@@ -68,8 +68,6 @@ public class MainActivity extends AppCompatActivity
         setUpFabs();
 
         setUpDrawer();
-
-        showFragment(AvailableRidesFragment.newInstance());
     }
 
     private void setUpDrawer() {
@@ -80,6 +78,8 @@ public class MainActivity extends AppCompatActivity
         //Instancia elementos do header
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(0);
+        showFragment(AvailableRidesFragment.newInstance());
 
         View navHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
         tvUsername = (TextView) navHeader.findViewById(R.id.tvUsername);
@@ -98,8 +98,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         tvCurrentVehicle = (TextView) navHeader.findViewById(R.id.tvCurrentVehicle);
-        Vehicle vehicle = user.getActiveCar();
-        updateDrawerVehicleInfo(vehicle);
+        updateDrawerVehicleInfo(user.getActiveCar());
     }
 
     private void updateDrawerVehicleInfo(Vehicle vehicle) {

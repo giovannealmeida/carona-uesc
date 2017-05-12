@@ -29,6 +29,7 @@ public class ChangeVehicleFragment extends Fragment {
     private MessageDeliveredListener messageDeliveredListener;
     private UserUpdateListener userUpdateListener;
 
+    private List<Vehicle> vehicles;
     private RecyclerView rvVehicles;
     private View emptyView;
     private View content;
@@ -74,7 +75,6 @@ public class ChangeVehicleFragment extends Fragment {
 
     private List<Vehicle> loadVehicles() {
         //Carrega os veículos
-        List<Vehicle> vehicles = null;
         SQLiteDatabase db = new DBHelper(getActivity().getApplicationContext()).getDatabase();
         Cursor cursor = db.query(DBHelper.TBL_VEHICLE, null, null, null, null, null, null, null);
 

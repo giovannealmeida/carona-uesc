@@ -27,8 +27,8 @@ public class NetworkHelper {
     private static Context context;
     private RequestQueue requestQueue;
 
-//        public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
-    public static final String DOMINIO = "http://10.1.1.109/caronauesc-web/"; // Repo
+        public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
+//    public static final String DOMINIO = "http://10.1.1.109/caronauesc-web/"; // Repo
     private final String API = "api/";
     private final String LOGIN = API + "UserService/login";
     private final String SIGNUP = API + "UserService/signup";

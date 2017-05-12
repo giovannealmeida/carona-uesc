@@ -140,11 +140,21 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                         currentDefaultVehiclePosition = tag;
                         notifyDataSetChanged();
                         userUpdateListener.OnVehicleUpdate(newMainVehicle);
+                    } else {
+                        new MaterialDialog.Builder(context)
+                                .content(context.getResources().getString(R.string.failed_saving_changes))
+                                .neutralText(R.string.dialog_action_ok)
+                                .show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    new MaterialDialog.Builder(context)
+                            .content(context.getResources().getString(R.string.failed_saving_changes))
+                            .neutralText(R.string.dialog_action_ok)
+                            .show();
+                } finally {
+                    helper.dismiss();
                 }
-                helper.dismiss();
             }
 
             @Override
