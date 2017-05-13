@@ -38,8 +38,8 @@ public class SessionHelper {
             return false;
         }
 
-        SQLiteDatabase db = new DBHelper(context).getDatabase();
-        Cursor cursor = db.query(DBHelper.TBL_SESSION, new String[]{"email"}, "user_id = ?", new String[]{id}, null, null, null, null);
+        DBHelper helper = DBHelper.getInstance(context);
+        Cursor cursor = helper.getDatabase().query(DBHelper.TBL_SESSION, new String[]{"email"}, "user_id = ?", new String[]{id}, null, null, null, null);
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
@@ -48,6 +48,7 @@ public class SessionHelper {
             }
         }
         cursor.close();
+        helper.close();
         //O email salvo não é válido, força logout.
         logout();
         return false;
@@ -55,7 +56,7 @@ public class SessionHelper {
 
     public void logout() {
         PreferencesHelper.getInstance(context).clearAll();
-        new DBHelper(context).clearAll();
+        DBHelper.getInstance(context).clearAll();
     }
 
     public String getUserFirstName() {
@@ -69,15 +70,15 @@ public class SessionHelper {
     public String getUserId() {
 //        return PreferencesHelper.getInstance(context).load(PreferencesHelper.USER_ID);
         String userId = "";
-        SQLiteDatabase db = new DBHelper(context).getDatabase();
-        Cursor cursor = db.query(DBHelper.TBL_SESSION, new String[]{"user_id"}, null, null, null, null, null, null);
+        DBHelper helper = DBHelper.getInstance(context);
+        Cursor cursor = helper.getDatabase().query(DBHelper.TBL_SESSION, new String[]{"user_id"}, null, null, null, null, null, null);
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
                 userId = String.valueOf(cursor.getInt(0));
         }
         cursor.close();
-
+        helper.close();
         return userId;
     }
 
@@ -93,7 +94,7 @@ public class SessionHelper {
      */
     public void saveUser(User user) {
         try {
-            DBHelper dbHelper = new DBHelper(context);
+            DBHelper helper = DBHelper.getInstance(context);
 
             //Salva no banco os dados sensíveis
             ContentValues values = new ContentValues();
@@ -102,7 +103,7 @@ public class SessionHelper {
             values.put("email", user.getEmail());
             values.put("password", user.getPassword());
 
-            dbHelper.getDatabase().insert(DBHelper.TBL_SESSION, null, values);
+            helper.getDatabase().insert(DBHelper.TBL_SESSION, null, values);
 
             //Salva no banco os veículos
             if (user.getVehicles() != null) {
@@ -121,17 +122,19 @@ public class SessionHelper {
                     values.put("color_hex", vehicle.getColorHex());
                     values.put("main_pic_url", vehicle.getMainPhotoUrl());
 
-                    dbHelper.getDatabase().insert(DBHelper.TBL_VEHICLE, null, values);
+                    helper.getDatabase().insert(DBHelper.TBL_VEHICLE, null, values);
                     if (vehicle.getGallery() != null) {
                         values = new ContentValues();
                         for (String picUrl : vehicle.getGallery()) {
                             values.put("vehicle_id", vehicle.getId());
                             values.put("pic_url", picUrl);
-                            dbHelper.getDatabase().insert(DBHelper.TBL_VEHICLE_GALLERY, null, values);
+                            helper.getDatabase().insert(DBHelper.TBL_VEHICLE_GALLERY, null, values);
                         }
                     }
                 }
             }
+
+            helper.close();
 
             //Salva no Shared Preferences dados de acesso rápido
 
@@ -166,18 +169,20 @@ public class SessionHelper {
      */
     public void updateUser(User user) {
         try {
-            DBHelper dbHelper = new DBHelper(context);
+            DBHelper helper = DBHelper.getInstance(context);
             ContentValues values = new ContentValues();
 
             values.put("email", user.getEmail());
             values.put("password", user.getPassword());
 
-            dbHelper.getDatabase().update(DBHelper.TBL_SESSION, values, "user_id=" + user.getId(), null);
+            helper.getDatabase().update(DBHelper.TBL_SESSION, values, "user_id=" + user.getId(), null);
+            helper.close();
 
             //Salva no Shared Preferences dados de acesso rápido
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_FIRST_NAME, user.getFirstName());
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_LAST_NAME, user.getLastName());
             PreferencesHelper.getInstance(context).save(PreferencesHelper.USER_EMAIL, user.getEmail());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -77,8 +77,8 @@ public class ChangeVehicleFragment extends Fragment {
 
     private List<Vehicle> loadVehicles() {
         //Carrega os veículos
-        SQLiteDatabase db = new DBHelper(getActivity().getApplicationContext()).getDatabase();
-        Cursor cursor = db.query(DBHelper.TBL_VEHICLE, null, null, null, null, null, null, null);
+        DBHelper helper = DBHelper.getInstance(getActivity().getApplicationContext());
+        Cursor cursor = helper.getDatabase().query(DBHelper.TBL_VEHICLE, null, null, null, null, null, null, null);
 
         if (cursor.getCount() > 0) {
             vehicles = new ArrayList<>();
@@ -102,12 +102,13 @@ public class ChangeVehicleFragment extends Fragment {
             } while (cursor.moveToNext());
         }
         cursor.close();
+        helper.close();
 
         //Se tem veículo, carrega as galerias
         if (vehicles != null) {
             List<String> galleryUrls = new ArrayList<>();
             for (Vehicle vehicle : vehicles) {
-                cursor = db.query(DBHelper.TBL_VEHICLE_GALLERY, null, "vehicle_id = ?", new String[]{vehicle.getId() + ""}, null, null, null, null);
+                cursor = helper.getDatabase().query(DBHelper.TBL_VEHICLE_GALLERY, null, "vehicle_id = ?", new String[]{vehicle.getId() + ""}, null, null, null, null);
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
                     do {
@@ -118,7 +119,7 @@ public class ChangeVehicleFragment extends Fragment {
             }
         }
         cursor.close();
-        db.close();
+
         return vehicles;
     }
 

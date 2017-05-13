@@ -20,13 +20,24 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TBL_RIDE_HISTORY = "ride_history";
 
     private SQLiteDatabase database;
+    private static DBHelper instance;
 
-    public DBHelper(Context context) {
+    public static DBHelper getInstance(Context context){
+        if(instance == null){
+            instance = new DBHelper(context);
+        }
+
+        return instance;
+    }
+
+    private DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-        database = getWritableDatabase();
     }
 
     public SQLiteDatabase getDatabase() {
+        if(database == null || !database.isOpen()){
+            database = getWritableDatabase();
+        }
         return database;
     }
 

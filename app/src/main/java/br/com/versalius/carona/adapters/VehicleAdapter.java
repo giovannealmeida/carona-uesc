@@ -2,6 +2,7 @@ package br.com.versalius.carona.adapters;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -128,12 +129,15 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
                     if(jsonObject.getBoolean("status")){
                         ContentValues cv = new ContentValues();
-                        DBHelper db = new DBHelper(context);
+                        DBHelper helper = DBHelper.getInstance(context);
+                        SQLiteDatabase db = helper.getDatabase();
                         cv.put("is_default",0);
-                        db.getDatabase().update(DBHelper.TBL_VEHICLE,cv,null,null);
+                        db.update(DBHelper.TBL_VEHICLE,cv,null,null);
 
                         cv.put("is_default",1);
-                        db.getDatabase().update(DBHelper.TBL_VEHICLE,cv,"id = ?",new String[]{newMainVehicle.getId()+""});
+                        db.update(DBHelper.TBL_VEHICLE,cv,"id = ?",new String[]{newMainVehicle.getId()+""});
+
+                        helper.close();
 
                         previousMainVehicle.setDefault(false);
                         newMainVehicle.setDefault(true);
