@@ -1,6 +1,7 @@
 package br.com.versalius.carona.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.versalius.carona.R;
+import br.com.versalius.carona.activities.VehicleSettingsActivity;
 import br.com.versalius.carona.adapters.VehicleAdapter;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
@@ -49,7 +51,7 @@ public class ChangeVehicleFragment extends Fragment {
         llAddVehicle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getActivity(),"Click",Toast.LENGTH_LONG).show();
+                startActivity(new Intent(getActivity(), VehicleSettingsActivity.class));
             }
         });
 
@@ -115,7 +117,8 @@ public class ChangeVehicleFragment extends Fragment {
                 }
             }
         }
-
+        cursor.close();
+        db.close();
         return vehicles;
     }
 

@@ -36,5 +36,7 @@ dependencies {
     compile 'com.afollestad.material-dialogs:core:0.9.4.4'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.android.support:support-v4:25.3.1'
+    compile 'org.honorato.multistatetogglebutton:multistatetogglebutton:0.2.2'
+    compile "com.github.danielnilsson9:color-picker-view:1.4.0@aar"
     testCompile 'junit:junit:4.12'
 }

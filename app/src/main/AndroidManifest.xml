@@ -46,6 +46,9 @@
         <activity
             android:name=".activities.PasswordRecoveryActivity"
             android:label="@string/title_activity_recovery" />
+        <activity
+            android:name=".activities.VehicleSettingsActivity"
+            android:label="@string/title_activity_vehicle_settings" />
     </application>
 
 </manifest>
