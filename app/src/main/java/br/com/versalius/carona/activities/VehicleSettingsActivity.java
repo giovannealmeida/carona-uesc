@@ -1,6 +1,7 @@
 package br.com.versalius.carona.activities;
 
 import android.annotation.TargetApi;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,7 +20,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -27,14 +27,11 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.GridLayout;
-import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -56,12 +53,13 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 import br.com.versalius.carona.R;
-import br.com.versalius.carona.adapters.GalleryAdapter;
 import br.com.versalius.carona.models.Vehicle;
 import br.com.versalius.carona.network.NetworkHelper;
 import br.com.versalius.carona.network.ResponseCallback;
 import br.com.versalius.carona.utils.CustomSnackBar;
+import br.com.versalius.carona.utils.DBHelper;
 import br.com.versalius.carona.utils.ProgressDialogHelper;
+import br.com.versalius.carona.utils.SessionHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class VehicleSettingsActivity extends AppCompatActivity implements View.OnFocusChangeListener, TextWatcher, ColorPickerDialogFragment.ColorPickerDialogListener, CompoundButton.OnCheckedChangeListener {
@@ -121,7 +119,7 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
 
     private void setUpViews() {
         ivVehicleMainPic = (CircleImageView) findViewById(R.id.ivVehicleMainPic);
-        ivUrlVehicle = (SimpleDraweeView)findViewById(R.id.ivUrlVehicle);
+        ivUrlVehicle = (SimpleDraweeView) findViewById(R.id.ivUrlVehicle);
         RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
         roundingParams.setRoundAsCircle(true);
         ivUrlVehicle.getHierarchy().setRoundingParams(roundingParams);
@@ -173,22 +171,33 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
         etPlate.addTextChangedListener(this); //ABC-1234
 
         swVehicleType = (MultiStateToggleButton) this.findViewById(R.id.toggleVehicleType);
-        swVehicleType.setValue(0);
         swVehicleType.setOnValueChangedListener(new ToggleButton.OnValueChangedListener() {
             @Override
             public void onValueChanged(int value) {
                 //0 - Carro
                 //1- Moto
-                if(value == 0){
+                if (value == 0) {
                     formData.put("type", String.valueOf(Vehicle.VEHICLE_TYPE_CAR));
 
-                    spNumDoors.setPrompt("");
+                    ArrayAdapter<CharSequence> spinnerArrayAdapter = ArrayAdapter.createFromResource(VehicleSettingsActivity.this, R.array.arr_num_doors, android.R.layout.simple_spinner_item);
+                    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spNumDoors.setAdapter(spinnerArrayAdapter);
+
                     spNumDoors.setEnabled(true);
                     spNumSits.setEnabled(true);
+                    swAirConditioner.setEnabled(true);
 
                 } else {
                     formData.put("type", String.valueOf(Vehicle.VEHICLE_TYPE_MOTO));
+
+                    //Seta 0 no número de portas
+                    String doors[] = {"0"};
+                    ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(VehicleSettingsActivity.this, android.R.layout.simple_spinner_item, doors);
+                    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
+                    spNumDoors.setAdapter(spinnerArrayAdapter);
+
                     swAirConditioner.setEnabled(false);
+                    swAirConditioner.setChecked(false);
                     spNumDoors.setSelection(0);
                     spNumDoors.setEnabled(false);
                     spNumSits.setSelection(0);
@@ -197,6 +206,7 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
 
             }
         });
+        swVehicleType.setValue(0);
 
         colorPicker = findViewById(R.id.colorPicker);
         updateColorPicker(selectedColor);
@@ -220,13 +230,14 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
                 if (NetworkHelper.isOnline(VehicleSettingsActivity.this)) {
                     if (isValidForm()) {
                         progressHelper.showSpinner(getString(R.string.progress_wait), getString(R.string.adding_vehicle), true, false);
-                        NetworkHelper.getInstance(VehicleSettingsActivity.this).doSignUp(formData, new ResponseCallback() {
+                        NetworkHelper.getInstance(VehicleSettingsActivity.this).insertVehicle(formData, new ResponseCallback() {
                             @Override
                             public void onSuccess(String jsonStringResponse) {
                                 try {
                                     progressHelper.dismiss();
                                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
                                     if (jsonObject.getBoolean("status")) {
+                                        saveVehicle(new Vehicle(jsonObject.getJSONObject("data")));
                                         CustomSnackBar.make(coordinatorLayout, "Veículo adicionado com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
                                         finish();
                                     } else {
@@ -249,6 +260,38 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
                 }
             }
         });
+    }
+
+    private void saveVehicle(Vehicle vehicle) {
+
+        DBHelper helper = DBHelper.getInstance(this);
+        if (vehicle != null) {
+            ContentValues values = new ContentValues();
+            values.put("id", vehicle.getId());
+            values.put("is_default", vehicle.isDefault() ? 1 : 0);
+            values.put("type", vehicle.getType());
+            values.put("model", vehicle.getModel());
+            values.put("brand", vehicle.getBrand());
+            values.put("air", vehicle.hasAir());
+            values.put("num_doors", vehicle.getNumDoors());
+            values.put("num_sits", vehicle.getNumSits());
+            values.put("plate", vehicle.getPlate());
+            values.put("color_name", vehicle.getColorName());
+            values.put("color_hex", vehicle.getColorHex());
+            values.put("main_pic_url", vehicle.getMainPhotoUrl());
+
+            helper.getDatabase().insert(DBHelper.TBL_VEHICLE, null, values);
+            if (vehicle.getGallery() != null) {
+                values = new ContentValues();
+                for (String picUrl : vehicle.getGallery()) {
+                    values.put("vehicle_id", vehicle.getId());
+                    values.put("pic_url", picUrl);
+                    helper.getDatabase().insert(DBHelper.TBL_VEHICLE_GALLERY, null, values);
+                }
+            }
+        }
+
+        helper.close();
     }
 
     /**
@@ -290,6 +333,14 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
         } else {
             formData.put("color_name", etColorName.getText().toString());
         }
+
+
+        formData.put("air", swAirConditioner.isChecked() ? "true" : "false");
+        formData.put("num_doors", (spNumDoors.getSelectedItem().equals("0") ? "false" : (String) spNumDoors.getSelectedItem()));
+        formData.put("num_sits", (String) spNumSits.getSelectedItem());
+
+        formData.put("user_id", new SessionHelper(this).getUserId());
+
         /* Se ninguém pediu foco então tá tudo em ordem */
         return !isFocusRequested;
     }
@@ -479,6 +530,11 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
         //Força ser cor opaca
         selectedColor = Color.argb(255, Color.red(color), Color.green(color), Color.blue(color));
         updateColorPicker(selectedColor);
+        formData.put("color_hex", colorToHexString(selectedColor));
+    }
+
+    private static String colorToHexString(int color) {
+        return String.format("#%06X", 0xFFFFFFFF & color);
     }
 
     @Override

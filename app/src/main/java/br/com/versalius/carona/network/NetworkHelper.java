@@ -27,17 +27,22 @@ public class NetworkHelper {
     private static Context context;
     private RequestQueue requestQueue;
 
-        public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
-//    public static final String DOMINIO = "http://10.1.1.109/caronauesc-web/"; // Repo
+//        public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
+    public static final String DOMINIO = "http://10.1.1.109/caronauesc-web/"; // Repo
+
     private final String API = "api/";
+    /*UserService*/
     private final String LOGIN = API + "UserService/login";
     private final String SIGNUP = API + "UserService/signup";
     private final String RECOVER_PASSWORD = API + "UserService/forgot_password_send_hash";
     private final String UPDATE = API + "UserService/update";
     private final String CHECK_EMAIL = API + "UserService/email_check";
-    private final String GET_RIDES = API + "RideService/get_by_status";
     private final String GET_USER = API + "UserService/get_user_by_id";
+    /*RideService*/
+    private final String GET_RIDES = API + "RideService/get_by_status";
+    /*VehicleService*/
     private final String UPDATE_DEFAULT_VEHICLE = API + "VehicleService/update_default";
+    private final String INSERT_VEHICLE = API + "VehicleService/insert";
 
     private NetworkHelper(Context context) {
         this.context = context;
@@ -160,6 +165,14 @@ public class NetworkHelper {
                 params,
                 TAG,
                 DOMINIO + UPDATE_DEFAULT_VEHICLE,
+                callback);
+    }
+
+    public void insertVehicle(HashMap<String,String> params, ResponseCallback callback) {
+        execute(Request.Method.POST,
+                params,
+                TAG,
+                DOMINIO + INSERT_VEHICLE,
                 callback);
     }
 

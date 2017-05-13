@@ -3,7 +3,6 @@ package br.com.versalius.carona.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +22,7 @@ import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
 import br.com.versalius.carona.models.Vehicle;
 import br.com.versalius.carona.utils.DBHelper;
+import br.com.versalius.carona.utils.ProgressDialogHelper;
 
 public class ChangeVehicleFragment extends Fragment {
 
@@ -35,6 +34,9 @@ public class ChangeVehicleFragment extends Fragment {
     private RecyclerView rvVehicles;
     private View emptyView;
     private View content;
+
+    private boolean isListUpdated = false;
+    private VehicleAdapter adapter;
 
     public static ChangeVehicleFragment newInstance() {
         return new ChangeVehicleFragment();
@@ -51,6 +53,7 @@ public class ChangeVehicleFragment extends Fragment {
         llAddVehicle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isListUpdated = false; //Quando a VehicleSettingsActivity fechar, a lista de carros vai ser carregada de novo
                 startActivity(new Intent(getActivity(), VehicleSettingsActivity.class));
             }
         });
@@ -66,22 +69,28 @@ public class ChangeVehicleFragment extends Fragment {
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvVehicles.setLayoutManager(manager);
         List<Vehicle> list = loadVehicles();
-        if(list == null){
+        if (list == null) {
             content.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
         } else {
-            VehicleAdapter adapter = new VehicleAdapter(list, getActivity());
+            adapter = new VehicleAdapter(list, getActivity());
             rvVehicles.setAdapter(adapter);
         }
     }
 
     private List<Vehicle> loadVehicles() {
+        ProgressDialogHelper progressDialog = new ProgressDialogHelper(getActivity());
+        progressDialog.showSpinner(null, getString(R.string.progress_loading_vehicles), true, false);
         //Carrega os veículos
         DBHelper helper = DBHelper.getInstance(getActivity().getApplicationContext());
         Cursor cursor = helper.getDatabase().query(DBHelper.TBL_VEHICLE, null, null, null, null, null, null, null);
 
         if (cursor.getCount() > 0) {
-            vehicles = new ArrayList<>();
+            if (vehicles == null) {
+                vehicles = new ArrayList<>();
+            } else {
+                vehicles.clear();
+            }
             cursor.moveToFirst();
             do {
                 Vehicle vehicle = new Vehicle();
@@ -119,7 +128,8 @@ public class ChangeVehicleFragment extends Fragment {
             }
         }
         cursor.close();
-
+        progressDialog.dismiss();
+        isListUpdated = true;
         return vehicles;
     }
 
@@ -138,5 +148,14 @@ public class ChangeVehicleFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         messageDeliveredListener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(!isListUpdated) {
+            loadVehicles();
+            adapter.notifyDataSetChanged();
+        }
     }
 }

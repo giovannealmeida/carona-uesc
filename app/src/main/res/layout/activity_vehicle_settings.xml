@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -125,7 +126,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="@string/lb_color"
+                android:text="@string/lb_vehicle_color"
                 android:textColor="@android:color/black"
                 android:textSize="20sp" />
 
@@ -147,7 +148,8 @@
                     android:layout_marginBottom="4dp"
                     android:layout_marginTop="4dp"
                     android:hint="@string/hint_color_name"
-                    android:inputType="textCapSentences" />
+                    android:inputType="textCapSentences"
+                    android:maxLength="16" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.v7.widget.SwitchCompat
@@ -215,19 +217,19 @@
             </RelativeLayout>
 
             <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="4dp"-->
-                <!--android:text="@string/lb_gallery"-->
-                <!--android:textColor="@android:color/black"-->
-                <!--android:textSize="20sp" />-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="4dp"-->
+            <!--android:text="@string/lb_gallery"-->
+            <!--android:textColor="@android:color/black"-->
+            <!--android:textSize="20sp" />-->
 
             <!--<GridView-->
-                <!--android:id="@+id/gvGallery"-->
-                <!--android:numColumns="auto_fit"-->
-                <!--android:columnWidth="60dp"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="130dp"/>-->
+            <!--android:id="@+id/gvGallery"-->
+            <!--android:numColumns="auto_fit"-->
+            <!--android:columnWidth="60dp"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="130dp"/>-->
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btSave"
@@ -240,4 +242,4 @@
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

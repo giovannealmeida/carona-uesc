@@ -104,7 +104,7 @@
     <string name="hint_brand">Marca</string>
     <string name="hint_model">Modelo</string>
     <string name="hint_plate">Placa</string>
-    <string name="lb_color">Cor</string>
+    <string name="lb_vehicle_color">Cor do veículo</string>
     <string name="hint_color_name">Nome da cor</string>
     <string name="lb_air_conditioner">Ar condicionado</string>
     <string name="title_activity_vehicle_settings">Configuração de veículo</string>
@@ -114,5 +114,6 @@
     <string name="lb_num_doors">Número de portas</string>
     <string name="lb_num_sits">Número de assentos</string>
     <string name="lb_gallery">Galeria</string>
+    <string name="progress_loading_vehicles">Carregando lista de veículos</string>
 
 </resources>
