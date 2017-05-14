@@ -115,5 +115,9 @@
     <string name="lb_num_sits">Número de assentos</string>
     <string name="lb_gallery">Galeria</string>
     <string name="progress_loading_vehicles">Carregando lista de veículos</string>
+    <string name="cant_remove_default_vehicle">Não pode deletar um veículo em uso!</string>
+    <string name="removing_vehicle">Removendo veículo</string>
+    <string name="success_removing_vehicle">Veículo removido com sucesso</string>
+    <string name="failed_removing_vehicle">Falha ao remover veículo</string>
 
 </resources>

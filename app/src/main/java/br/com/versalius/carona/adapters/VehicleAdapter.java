@@ -2,9 +2,11 @@ package br.com.versalius.carona.adapters;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +29,7 @@ import org.json.JSONObject;
 import java.util.List;
 
 import br.com.versalius.carona.R;
+import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
 import br.com.versalius.carona.models.Vehicle;
@@ -46,6 +49,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
     private LayoutInflater inflater;
     private RecycleViewOnItemClickListener onItemClickListener;
     private UserUpdateListener userUpdateListener;
+    private MessageDeliveredListener messageDeliveredListener;
     private Context context;
     private int currentDefaultVehiclePosition = 0;
 
@@ -55,6 +59,9 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         this.context = context;
         if(context instanceof UserUpdateListener){
             userUpdateListener = (UserUpdateListener) context;
+        }
+        if(context instanceof MessageDeliveredListener){
+            messageDeliveredListener = (MessageDeliveredListener) context;
         }
     }
 
@@ -92,13 +99,48 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         holder.btIsDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(context,context.getString(R.string.this_is_already_main_vehicle),Toast.LENGTH_LONG).show();
+                messageDeliveredListener.onMessageDelivered(context.getString(R.string.this_is_already_main_vehicle), Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.INFO);
             }
         });
         holder.btDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(list.get(position).isDefault()){
+                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.cant_remove_default_vehicle), Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.INFO);
+                } else {
+                    final ProgressDialogHelper dialogHelper = new ProgressDialogHelper(context);
+                    dialogHelper.showSpinner(null,context.getString(R.string.removing_vehicle),false,false);
+                    NetworkHelper.getInstance(context).removeVehicle(String.valueOf(list.get(position).getId()), new ResponseCallback() {
+                        @Override
+                        public void onSuccess(String jsonStringResponse) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(jsonStringResponse);
+                                if(jsonObject.getBoolean("status")){
+                                    DBHelper helper = DBHelper.getInstance(context);
+                                    helper.getDatabase().delete(DBHelper.TBL_VEHICLE,"id = ?",new String[]{""+list.get(position).getId()});
+                                    helper.getDatabase().delete(DBHelper.TBL_VEHICLE_GALLERY,"vehicle_id = ?",new String[]{""+list.get(position).getId()});
+                                    helper.close();
+                                    list.remove(position);
+                                    notifyDataSetChanged();
+                                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.success_removing_vehicle),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.SUCCESS);
+                                } else {
+                                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_removing_vehicle),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_removing_vehicle),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+                            } finally {
+                                dialogHelper.dismiss();
+                            }
+                        }
 
+                        @Override
+                        public void onFail(VolleyError error) {
+                            dialogHelper.dismiss();
+                            messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_removing_vehicle),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+                        }
+                    });
+                }
             }
         });
         holder.btEdit.setOnClickListener(new View.OnClickListener() {
@@ -145,17 +187,12 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                         notifyDataSetChanged();
                         userUpdateListener.OnVehicleUpdate(newMainVehicle);
                     } else {
-                        new MaterialDialog.Builder(context)
-                                .content(context.getResources().getString(R.string.failed_saving_changes))
-                                .neutralText(R.string.dialog_action_ok)
-                                .show();
+                        messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_saving_changes),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    new MaterialDialog.Builder(context)
-                            .content(context.getResources().getString(R.string.failed_saving_changes))
-                            .neutralText(R.string.dialog_action_ok)
-                            .show();
+                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_saving_changes),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
                 } finally {
                     helper.dismiss();
                 }
@@ -164,10 +201,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             @Override
             public void onFail(VolleyError error) {
                 helper.dismiss();
-                new MaterialDialog.Builder(context)
-                        .content(context.getResources().getString(R.string.failed_saving_changes))
-                        .neutralText(R.string.dialog_action_ok)
-                        .show();
+                messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_saving_changes),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
             }
         });
     }

@@ -43,6 +43,7 @@ public class NetworkHelper {
     /*VehicleService*/
     private final String UPDATE_DEFAULT_VEHICLE = API + "VehicleService/update_default";
     private final String INSERT_VEHICLE = API + "VehicleService/insert";
+    private final String REMOVE_VEHICLE = API + "VehicleService/remove";
 
     private NetworkHelper(Context context) {
         this.context = context;
@@ -173,6 +174,16 @@ public class NetworkHelper {
                 params,
                 TAG,
                 DOMINIO + INSERT_VEHICLE,
+                callback);
+    }
+
+    public void removeVehicle(String id, ResponseCallback callback) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("id", id);
+        execute(Request.Method.POST,
+                params,
+                TAG,
+                DOMINIO + REMOVE_VEHICLE,
                 callback);
     }
 
