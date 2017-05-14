@@ -1,6 +1,7 @@
 package br.com.versalius.carona.activities;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -237,8 +238,18 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
                                     progressHelper.dismiss();
                                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
                                     if (jsonObject.getBoolean("status")) {
-                                        saveVehicle(new Vehicle(jsonObject.getJSONObject("data")));
+                                        Vehicle vehicle = new Vehicle(jsonObject.getJSONObject("data"));
+                                        saveVehicle(vehicle);
                                         CustomSnackBar.make(coordinatorLayout, "Veículo adicionado com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
+
+                                        //Devolve o veículo pra ChangeVehicleFragment e encerra
+                                        Intent data = new Intent();
+                                        data.putExtra("vehicle", vehicle);
+                                        if (getParent() == null) {
+                                            setResult(Activity.RESULT_OK, data);
+                                        } else {
+                                            getParent().setResult(Activity.RESULT_OK, data);
+                                        }
                                         finish();
                                     } else {
                                         CustomSnackBar.make(coordinatorLayout, "Falha ao adiconar veículo", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();

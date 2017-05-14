@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,7 +24,11 @@ import br.com.versalius.carona.models.Vehicle;
 import br.com.versalius.carona.utils.DBHelper;
 import br.com.versalius.carona.utils.ProgressDialogHelper;
 
+import static android.app.Activity.RESULT_OK;
+
 public class ChangeVehicleFragment extends Fragment {
+
+    private static final int ACTION_ADD_VEHICLE = 1000;
 
     //Listeners
     private MessageDeliveredListener messageDeliveredListener;
@@ -36,7 +39,6 @@ public class ChangeVehicleFragment extends Fragment {
     private View emptyView;
     private View content;
 
-    private boolean isListUpdated = false;
     private VehicleAdapter adapter;
 
     public static ChangeVehicleFragment newInstance() {
@@ -54,17 +56,7 @@ public class ChangeVehicleFragment extends Fragment {
         llAddVehicle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isListUpdated = false; //Quando a VehicleSettingsActivity fechar, a lista de carros vai ser carregada de novo
-                startActivity(new Intent(getActivity(), VehicleSettingsActivity.class));
-            }
-        });
-
-        AppCompatButton btAddVehicle = (AppCompatButton) rootView.findViewById(R.id.btAddVehicle);
-        btAddVehicle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isListUpdated = false;
-                startActivity(new Intent(getActivity(), VehicleSettingsActivity.class));
+                startActivityForResult(new Intent(getActivity(), VehicleSettingsActivity.class),ACTION_ADD_VEHICLE);
             }
         });
 
@@ -80,12 +72,35 @@ public class ChangeVehicleFragment extends Fragment {
         rvVehicles.setLayoutManager(manager);
         List<Vehicle> list = loadVehicles();
         //Seta o adapter mesmo a lista sendo null. Se um veículo for adicionado só é preciso chamar notifyDatasetChaged()
-        adapter = new VehicleAdapter(list, getActivity());
+        adapter = new VehicleAdapter(list, getActivity(), new OnVehicleListChanged() {
+            @Override
+            public void onVehicleAdded(Vehicle vehicle) {
+                //Nunca acontece dentro do adapter
+            }
+
+            @Override
+            public void onVehicleRemoved() {
+                checkListChanges();
+            }
+        });
         rvVehicles.setAdapter(adapter);
 
         if (list == null) {
             content.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /**
+     * Verifica se é necessário mostrar emptyView ou não
+     */
+    private void checkListChanges() {
+        if(adapter.getItemCount() > 0){
+            emptyView.setVisibility(View.GONE);
+            content.setVisibility(View.VISIBLE);
+        } else {
+            emptyView.setVisibility(View.VISIBLE);
+            content.setVisibility(View.GONE);
         }
     }
 
@@ -140,7 +155,6 @@ public class ChangeVehicleFragment extends Fragment {
         }
         cursor.close();
         progressDialog.dismiss();
-        isListUpdated = true;
         return vehicles;
     }
 
@@ -162,15 +176,21 @@ public class ChangeVehicleFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if(!isListUpdated) {
-            loadVehicles();
-            adapter.notifyDataSetChanged();
-            if(!adapter.getDataset().isEmpty()){
-                emptyView.setVisibility(View.GONE);
-                content.setVisibility(View.VISIBLE);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == ACTION_ADD_VEHICLE) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                adapter.addItem((Vehicle)data.getSerializableExtra("vehicle"));
+                checkListChanges();
             }
         }
+    }
+
+    public interface OnVehicleListChanged {
+        //A ideia era usar esse primeiro método na VehicleSettingsActivity após um novo veículo ser adicionado
+        //startActivityForResult se mostrou mais limpo
+        void onVehicleAdded(Vehicle vehicle);
+        void onVehicleRemoved();
     }
 }

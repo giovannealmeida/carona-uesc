@@ -2,23 +2,16 @@ package br.com.versalius.carona.adapters;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.VolleyError;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -29,6 +22,7 @@ import org.json.JSONObject;
 import java.util.List;
 
 import br.com.versalius.carona.R;
+import br.com.versalius.carona.fragments.ChangeVehicleFragment;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
@@ -45,24 +39,27 @@ import br.com.versalius.carona.utils.ProgressDialogHelper;
 
 public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHolder> {
 
+    private UserUpdateListener userUpdateListener;
+    private MessageDeliveredListener messageDeliveredListener;
+    private ChangeVehicleFragment.OnVehicleListChanged onVehicleListChanged;
+
     private List<Vehicle> list;
     private LayoutInflater inflater;
     private RecycleViewOnItemClickListener onItemClickListener;
-    private UserUpdateListener userUpdateListener;
-    private MessageDeliveredListener messageDeliveredListener;
     private Context context;
-    private int currentDefaultVehiclePosition = 0;
+    private int currentDefaultVehiclePosition = -1;
 
-    public VehicleAdapter(List<Vehicle> list, Context context) {
+    public VehicleAdapter(List<Vehicle> list, Context context, ChangeVehicleFragment.OnVehicleListChanged onVehicleListChanged) {
         this.list = list;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.context = context;
-        if(context instanceof UserUpdateListener){
+        if (context instanceof UserUpdateListener) {
             userUpdateListener = (UserUpdateListener) context;
         }
-        if(context instanceof MessageDeliveredListener){
+        if (context instanceof MessageDeliveredListener) {
             messageDeliveredListener = (MessageDeliveredListener) context;
         }
+        this.onVehicleListChanged = onVehicleListChanged;
     }
 
     @Override
@@ -76,11 +73,11 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         holder.tvVehicleBrand.setText(list.get(position).getBrand());
         holder.tvVehicleModel.setText(list.get(position).getModel());
 
-       if(list.get(position).getMainPhotoUrl() != null) {
+        if (list.get(position).getMainPhotoUrl() != null) {
             holder.ivVehicle.setImageURI(Uri.parse(list.get(position).getMainPhotoUrl()));
         }
 
-        if(list.get(position).isDefault()){
+        if (list.get(position).isDefault()) {
             currentDefaultVehiclePosition = position;
             holder.btIsNotDefault.setVisibility(View.GONE);
             holder.btIsDefault.setVisibility(View.VISIBLE);
@@ -93,42 +90,47 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         holder.btIsNotDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateMainVehicle(list.get(currentDefaultVehiclePosition),list.get((int)view.getTag()),(int) view.getTag());
+                if(currentDefaultVehiclePosition >= 0) { //Se existe um veículo default
+                    updateMainVehicle(list.get(currentDefaultVehiclePosition), list.get((int) view.getTag()), (int) view.getTag());
+                } else { //Se não existe um veículo default
+                    updateMainVehicle(null, list.get((int) view.getTag()), (int) view.getTag());
+                }
             }
         });
         holder.btIsDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                messageDeliveredListener.onMessageDelivered(context.getString(R.string.this_is_already_main_vehicle), Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.INFO);
+                updateMainVehicle(list.get(currentDefaultVehiclePosition), null, 0);
             }
         });
         holder.btDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(list.get(position).isDefault()){
-                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.cant_remove_default_vehicle), Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.INFO);
+                if (list.get(position).isDefault()) {
+                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.cant_remove_default_vehicle), Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.INFO);
                 } else {
                     final ProgressDialogHelper dialogHelper = new ProgressDialogHelper(context);
-                    dialogHelper.showSpinner(null,context.getString(R.string.removing_vehicle),false,false);
+                    dialogHelper.showSpinner(null, context.getString(R.string.removing_vehicle), false, false);
                     NetworkHelper.getInstance(context).removeVehicle(String.valueOf(list.get(position).getId()), new ResponseCallback() {
                         @Override
                         public void onSuccess(String jsonStringResponse) {
                             try {
                                 JSONObject jsonObject = new JSONObject(jsonStringResponse);
-                                if(jsonObject.getBoolean("status")){
+                                if (jsonObject.getBoolean("status")) {
                                     DBHelper helper = DBHelper.getInstance(context);
-                                    helper.getDatabase().delete(DBHelper.TBL_VEHICLE,"id = ?",new String[]{""+list.get(position).getId()});
-                                    helper.getDatabase().delete(DBHelper.TBL_VEHICLE_GALLERY,"vehicle_id = ?",new String[]{""+list.get(position).getId()});
+                                    helper.getDatabase().delete(DBHelper.TBL_VEHICLE, "id = ?", new String[]{"" + list.get(position).getId()});
+                                    helper.getDatabase().delete(DBHelper.TBL_VEHICLE_GALLERY, "vehicle_id = ?", new String[]{"" + list.get(position).getId()});
                                     helper.close();
                                     list.remove(position);
                                     notifyDataSetChanged();
-                                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.success_removing_vehicle),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.SUCCESS);
+                                    onVehicleListChanged.onVehicleRemoved();
+                                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.success_removing_vehicle), Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.SUCCESS);
                                 } else {
-                                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_removing_vehicle),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+                                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_removing_vehicle), Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                                messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_removing_vehicle),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+                                messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_removing_vehicle), Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR);
                             } finally {
                                 dialogHelper.dismiss();
                             }
@@ -137,7 +139,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                         @Override
                         public void onFail(VolleyError error) {
                             dialogHelper.dismiss();
-                            messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_removing_vehicle),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+                            messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_removing_vehicle), Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR);
                         }
                     });
                 }
@@ -155,44 +157,57 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
      * Atualiza o banco de dados, tornando o novo veículo como o principal e depois atualiza a lista.
      * O botão do novo carro principal deve ser selecionado, para isso a tag do novo botão a ser selecionado
      * é passado por parâmetro.
+     * <p>
+     * Se o primeiro parâmetro (lastMainVehicle) for null, deve-se atribuir um novo veículo principal, somente.
+     * Se o segundo parâmetro (newMainVehicle) for null, deve-se somente remover o veículo principal
+     * atual e tornar o usuário um caroneiro.
      *
      * @param previousMainVehicle
      * @param newMainVehicle
      * @param tag
      */
     private void updateMainVehicle(final Vehicle previousMainVehicle, final Vehicle newMainVehicle, final int tag) {
-        final ProgressDialogHelper helper = new ProgressDialogHelper(context);
-        helper.showSpinner(context.getResources().getString(R.string.progress_wait),context.getString(R.string.progress_saving_changes),false,false);
+        final String previousId = String.valueOf(previousMainVehicle == null ? null : String.valueOf(previousMainVehicle.getId()));
+        final String newId = String.valueOf(newMainVehicle == null ? null : String.valueOf(newMainVehicle.getId()));
 
-        NetworkHelper.getInstance(context).updateDefaultVehicle(String.valueOf(previousMainVehicle.getId()),String.valueOf(newMainVehicle.getId()), new ResponseCallback() {
+        final ProgressDialogHelper helper = new ProgressDialogHelper(context);
+        helper.showSpinner(context.getResources().getString(R.string.progress_wait), context.getString(R.string.progress_saving_changes), false, false);
+
+        NetworkHelper.getInstance(context).updateDefaultVehicle(previousId, newId, new ResponseCallback() {
             @Override
             public void onSuccess(String jsonStringResponse) {
                 try {
                     JSONObject jsonObject = new JSONObject(jsonStringResponse);
-                    if(jsonObject.getBoolean("status")){
+                    if (jsonObject.getBoolean("status")) {
                         ContentValues cv = new ContentValues();
                         DBHelper helper = DBHelper.getInstance(context);
                         SQLiteDatabase db = helper.getDatabase();
-                        cv.put("is_default",0);
-                        db.update(DBHelper.TBL_VEHICLE,cv,null,null);
+                        if(previousMainVehicle != null) {
+                            cv.put("is_default", 0);
+                            db.update(DBHelper.TBL_VEHICLE, cv, null, null);
+                            previousMainVehicle.setDefault(false);
+                        }
 
-                        cv.put("is_default",1);
-                        db.update(DBHelper.TBL_VEHICLE,cv,"id = ?",new String[]{newMainVehicle.getId()+""});
+                        if (newMainVehicle != null) {
+                            cv.put("is_default", 1);
+                            db.update(DBHelper.TBL_VEHICLE, cv, "id = ?", new String[]{newMainVehicle.getId() + ""});
+                            newMainVehicle.setDefault(true);
+                            currentDefaultVehiclePosition = tag;
+                        } else {
+                            currentDefaultVehiclePosition = -1;
+                        }
 
                         helper.close();
 
-                        previousMainVehicle.setDefault(false);
-                        newMainVehicle.setDefault(true);
-                        currentDefaultVehiclePosition = tag;
                         notifyDataSetChanged();
                         userUpdateListener.OnVehicleUpdate(newMainVehicle);
                     } else {
-                        messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_saving_changes),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+                        messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_saving_changes), Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR);
 
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_saving_changes),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+                    messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_saving_changes), Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR);
                 } finally {
                     helper.dismiss();
                 }
@@ -201,7 +216,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
             @Override
             public void onFail(VolleyError error) {
                 helper.dismiss();
-                messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_saving_changes),Snackbar.LENGTH_LONG,CustomSnackBar.SnackBarType.ERROR);
+                messageDeliveredListener.onMessageDelivered(context.getString(R.string.failed_saving_changes), Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR);
             }
         });
     }
@@ -211,12 +226,17 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         return list != null ? list.size() : 0;
     }
 
-    public void setOnItemClickListener(RecycleViewOnItemClickListener listener){
+    public void setOnItemClickListener(RecycleViewOnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
 
-    public List<Vehicle> getDataset(){
+    public List<Vehicle> getDataset() {
         return list;
+    }
+
+    public void addItem(Vehicle vehicle) {
+        list.add(vehicle);
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -243,8 +263,8 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
 
         @Override
         public void onClick(View v) {
-            if(onItemClickListener != null){
-                onItemClickListener.onItemClick(v,getAdapterPosition());
+            if (onItemClickListener != null) {
+                onItemClickListener.onItemClick(v, getAdapterPosition());
             }
         }
     }

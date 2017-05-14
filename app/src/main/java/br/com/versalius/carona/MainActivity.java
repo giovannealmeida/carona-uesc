@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity
             }
         } else {
             tvCurrentVehicle.setText(getResources().getString(R.string.lb_passenger));
+            tvCurrentVehicle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_thumb_white, 0, 0, 0);
         }
     }
 
