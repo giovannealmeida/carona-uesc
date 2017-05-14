@@ -88,7 +88,8 @@
                     android:layout_marginBottom="4dp"
                     android:layout_marginTop="4dp"
                     android:hint="@string/hint_brand"
-                    android:inputType="textCapWords" />
+                    android:inputType="textCapWords"
+                    android:maxLength="16" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -103,7 +104,8 @@
                     android:layout_marginBottom="4dp"
                     android:layout_marginTop="4dp"
                     android:hint="@string/hint_model"
-                    android:inputType="textCapWords" />
+                    android:inputType="textCapWords"
+                    android:maxLength="16" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout

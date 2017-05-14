@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -58,6 +59,15 @@ public class ChangeVehicleFragment extends Fragment {
             }
         });
 
+        AppCompatButton btAddVehicle = (AppCompatButton) rootView.findViewById(R.id.btAddVehicle);
+        btAddVehicle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isListUpdated = false;
+                startActivity(new Intent(getActivity(), VehicleSettingsActivity.class));
+            }
+        });
+
         setUpRecyclerView(rootView);
         return rootView;
     }
@@ -69,12 +79,13 @@ public class ChangeVehicleFragment extends Fragment {
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         rvVehicles.setLayoutManager(manager);
         List<Vehicle> list = loadVehicles();
+        //Seta o adapter mesmo a lista sendo null. Se um veículo for adicionado só é preciso chamar notifyDatasetChaged()
+        adapter = new VehicleAdapter(list, getActivity());
+        rvVehicles.setAdapter(adapter);
+
         if (list == null) {
             content.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
-        } else {
-            adapter = new VehicleAdapter(list, getActivity());
-            rvVehicles.setAdapter(adapter);
         }
     }
 
@@ -156,6 +167,10 @@ public class ChangeVehicleFragment extends Fragment {
         if(!isListUpdated) {
             loadVehicles();
             adapter.notifyDataSetChanged();
+            if(!adapter.getDataset().isEmpty()){
+                emptyView.setVisibility(View.GONE);
+                content.setVisibility(View.VISIBLE);
+            }
         }
     }
 }
