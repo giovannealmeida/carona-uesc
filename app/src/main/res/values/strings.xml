@@ -118,5 +118,6 @@
     <string name="removing_vehicle">Removendo veículo</string>
     <string name="success_removing_vehicle">Veículo removido com sucesso</string>
     <string name="failed_removing_vehicle">Falha ao remover veículo</string>
+    <string name="title_edit_vehicle">Alterar veículo</string>
 
 </resources>

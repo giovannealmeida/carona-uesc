@@ -28,7 +28,7 @@ public class NetworkHelper {
     private RequestQueue requestQueue;
 
 //        public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
-    public static final String DOMINIO = "http://10.1.1.109/caronauesc-web/"; // Repo
+    public static final String DOMINIO = "http://10.1.1.103/caronauesc-web/"; // Repo
 
     private final String API = "api/";
     /*UserService*/
@@ -44,6 +44,7 @@ public class NetworkHelper {
     private final String UPDATE_DEFAULT_VEHICLE = API + "VehicleService/update_default";
     private final String INSERT_VEHICLE = API + "VehicleService/insert";
     private final String REMOVE_VEHICLE = API + "VehicleService/remove";
+    private final String UPDATE_VEHICLE = API + "VehicleService/update";
 
     private NetworkHelper(Context context) {
         this.context = context;
@@ -184,6 +185,14 @@ public class NetworkHelper {
                 params,
                 TAG,
                 DOMINIO + REMOVE_VEHICLE,
+                callback);
+    }
+
+    public void updateVehicle(HashMap<String,String> params, ResponseCallback callback) {
+        execute(Request.Method.POST,
+                params,
+                TAG,
+                DOMINIO + UPDATE_VEHICLE,
                 callback);
     }
 

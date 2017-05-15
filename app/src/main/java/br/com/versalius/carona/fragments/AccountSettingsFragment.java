@@ -301,7 +301,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
             }
         });
 
-        Button btSave = (Button) rootView.findViewById(R.id.btSave);
+        Button btSave = (Button) rootView.findViewById(R.id.btAdd);
         btSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -21,6 +21,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -29,7 +30,6 @@ import android.util.Base64;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -95,6 +95,8 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
     private View colorPicker;
     //Inicializa com cor preta opaca
     private int selectedColor = Color.argb(255, Color.red(0), Color.green(0), Color.blue(0));
+    private AppCompatButton btAdd;
+    private AppCompatButton btSave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,10 +105,60 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
         EventBus.getDefault().register(this);
         formData = new HashMap<>();
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.action_add_vehicle);
         setUpViews();
+        Vehicle vehicle = (Vehicle) getIntent().getSerializableExtra("vehicle");
+        if (vehicle != null) { //Preenche tudo com os dados deste veículo para edição
+            setData(vehicle);
+        } else {//Não tem veículo pra edição, mostra botão de adicionar veículo
+            btAdd.setVisibility(View.VISIBLE);
+            btSave.setVisibility(View.GONE);
+        }
 //        setUpGallery();
+    }
+
+    private void setData(Vehicle vehicle) {
+        getSupportActionBar().setTitle(R.string.title_edit_vehicle);
+
+        ivUrlVehicle.setImageURI(Uri.parse(vehicle.getMainPhotoUrl()));
+
+        if (vehicle.getType() == Vehicle.VEHICLE_TYPE_CAR) { //Se for carro
+            swVehicleType.setValue(0);
+
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.arr_num_doors, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spNumDoors.setAdapter(adapter);
+            spNumDoors.setSelection(adapter.getPosition(String.valueOf(vehicle.getNumDoors())));
+
+            adapter = ArrayAdapter.createFromResource(this, R.array.arr_num_sits, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spNumSits.setAdapter(adapter);
+            spNumSits.setSelection(adapter.getPosition(String.valueOf(vehicle.getNumSits())));
+
+        } else { //Se for moto
+            swVehicleType.setValue(1);
+
+            //Seta 0 portas
+            String doors[] = {"0"};
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(VehicleSettingsActivity.this, android.R.layout.simple_spinner_item, doors);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spNumDoors.setAdapter(adapter);
+            spNumDoors.setSelection(0);
+            spNumDoors.setEnabled(false);
+            //Seta 1 assento
+            spNumSits.setSelection(0);
+            spNumSits.setEnabled(false);
+
+            swAirConditioner.setEnabled(false);
+        }
+        etBrand.setText(vehicle.getBrand());
+        etModel.setText(vehicle.getModel());
+        etPlate.setText(vehicle.getPlate());
+        selectedColor = Color.parseColor(vehicle.getColorHex());
+        ((GradientDrawable) colorPicker.getBackground().mutate()).setColor(selectedColor);
+        etColorName.setText(vehicle.getColorName());
+        swAirConditioner.setChecked(vehicle.hasAir());
     }
 
 //    private void setUpGallery() {
@@ -223,8 +275,9 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
             }
         });
 
-        Button btSave = (Button) findViewById(R.id.btSave);
-        btSave.setOnClickListener(new View.OnClickListener() {
+        //Usado quando um veículo é adicionado
+        btAdd = (AppCompatButton) findViewById(R.id.btAdd);
+        btAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final ProgressDialogHelper progressHelper = new ProgressDialogHelper(VehicleSettingsActivity.this);
@@ -271,6 +324,56 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
                 }
             }
         });
+
+        //Usado quando um veículo é editado
+        btSave = (AppCompatButton) findViewById(R.id.btSave);
+        btSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final ProgressDialogHelper progressHelper = new ProgressDialogHelper(VehicleSettingsActivity.this);
+                if (NetworkHelper.isOnline(VehicleSettingsActivity.this)) {
+                    if (isValidForm()) {
+                        progressHelper.showSpinner(getString(R.string.progress_wait), getString(R.string.adding_vehicle), true, false);
+                        NetworkHelper.getInstance(VehicleSettingsActivity.this).updateVehicle(formData, new ResponseCallback() {
+                            @Override
+                            public void onSuccess(String jsonStringResponse) {
+                                try {
+                                    progressHelper.dismiss();
+                                    JSONObject jsonObject = new JSONObject(jsonStringResponse);
+                                    if (jsonObject.getBoolean("status")) {
+                                        Vehicle vehicle = new Vehicle(jsonObject.getJSONObject("data"));
+                                        saveVehicle(vehicle);
+                                        CustomSnackBar.make(coordinatorLayout, "Veículo alterado com sucesso", Snackbar.LENGTH_SHORT, CustomSnackBar.SnackBarType.SUCCESS).show();
+
+                                        //Devolve o veículo pra ChangeVehicleFragment e encerra
+                                        Intent data = new Intent();
+                                        data.putExtra("vehicle", vehicle);
+                                        if (getParent() == null) {
+                                            setResult(Activity.RESULT_OK, data);
+                                        } else {
+                                            getParent().setResult(Activity.RESULT_OK, data);
+                                        }
+                                        finish();
+                                    } else {
+                                        CustomSnackBar.make(coordinatorLayout, "Falha ao alterar veículo", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFail(VolleyError error) {
+                                progressHelper.dismiss();
+                                CustomSnackBar.make(coordinatorLayout, "Falha ao alterar veículo", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
+                            }
+                        });
+                    }
+                } else {
+                    CustomSnackBar.make(coordinatorLayout, "Você está offline", Snackbar.LENGTH_LONG, CustomSnackBar.SnackBarType.ERROR).show();
+                }
+            }
+        });
     }
 
     private void saveVehicle(Vehicle vehicle) {
@@ -291,13 +394,21 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
             values.put("color_hex", vehicle.getColorHex());
             values.put("main_pic_url", vehicle.getMainPhotoUrl());
 
-            helper.getDatabase().insert(DBHelper.TBL_VEHICLE, null, values);
+            if (btAdd.getVisibility() == View.VISIBLE) {
+                helper.getDatabase().insert(DBHelper.TBL_VEHICLE, null, values);
+            } else {
+                helper.getDatabase().update(DBHelper.TBL_VEHICLE, values, "id = ?", new String[]{"" + vehicle.getId()});
+            }
             if (vehicle.getGallery() != null) {
                 values = new ContentValues();
                 for (String picUrl : vehicle.getGallery()) {
                     values.put("vehicle_id", vehicle.getId());
                     values.put("pic_url", picUrl);
-                    helper.getDatabase().insert(DBHelper.TBL_VEHICLE_GALLERY, null, values);
+                    if (btAdd.getVisibility() == View.VISIBLE) {
+                        helper.getDatabase().insert(DBHelper.TBL_VEHICLE_GALLERY, null, values);
+                    } else {
+                        helper.getDatabase().update(DBHelper.TBL_VEHICLE_GALLERY, values, "vehicle_id = ?", new String[]{"" + vehicle.getId()});
+                    }
                 }
             }
         }
@@ -545,7 +656,7 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
     }
 
     private static String colorToHexString(int color) {
-        return String.format("#%06X", 0xFFFFFFFF & color);
+        return String.format("#%06X", 0xFFFFFF & color);
     }
 
     @Override

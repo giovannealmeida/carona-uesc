@@ -2,6 +2,7 @@ package br.com.versalius.carona.adapters;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
@@ -19,9 +20,11 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.versalius.carona.R;
+import br.com.versalius.carona.activities.VehicleSettingsActivity;
 import br.com.versalius.carona.fragments.ChangeVehicleFragment;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
@@ -148,7 +151,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         holder.btEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                context.startActivity(new Intent(context, VehicleSettingsActivity.class).putExtra("vehicle",list.get(position)));
             }
         });
     }
@@ -235,6 +238,9 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
     }
 
     public void addItem(Vehicle vehicle) {
+        if(list == null){//O usuario nao possui veículo algum
+            list = new ArrayList<>();
+        }
         list.add(vehicle);
         notifyDataSetChanged();
     }
