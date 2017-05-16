@@ -462,6 +462,7 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
         formData.put("num_sits", (String) spNumSits.getSelectedItem());
 
         formData.put("user_id", new SessionHelper(this).getUserId());
+        formData.put("color_hex", colorToHexString(selectedColor));
 
         /* Se ninguém pediu foco então tá tudo em ordem */
         return !isFocusRequested;
@@ -652,7 +653,6 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
         //Força ser cor opaca
         selectedColor = Color.argb(255, Color.red(color), Color.green(color), Color.blue(color));
         updateColorPicker(selectedColor);
-        formData.put("color_hex", colorToHexString(selectedColor));
     }
 
     private static String colorToHexString(int color) {
