@@ -26,33 +26,39 @@
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="25dp">
+                android:layout_gravity="center_horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/ivVehicleMainPic"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
                     android:src="@drawable/ic_empty_vehicle_list"
-                    android:visibility="gone"
-                    app:civ_border_color="#FF000000"
-                    app:civ_border_width="2dp" />
+                    android:visibility="gone"/>
 
                 <com.facebook.drawee.view.SimpleDraweeView
                     android:id="@+id/ivUrlVehicle"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
                     app:placeholderImage="@drawable/ic_empty_vehicle_list" />
 
                 <ImageButton
                     android:id="@+id/btGetImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="bottom|end"
                     android:background="@drawable/circular_button"
-                    android:padding="7dp"
+                    android:scaleType="fitXY"
                     android:src="@drawable/ic_plus_circle" />
+
+                <ImageButton
+                    android:id="@+id/btRemoveImage"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:visibility="gone"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/circular_button"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_close_circle" />
             </FrameLayout>
 
             <TextView
@@ -235,12 +241,12 @@
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btAdd"
-                android:visibility="gone"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:elevation="4dp"
                 android:text="@string/action_add_vehicle"
+                android:visibility="gone"
                 app:backgroundTint="@color/colorButton" />
 
             <android.support.v7.widget.AppCompatButton

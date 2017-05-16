@@ -15,8 +15,7 @@ import br.com.versalius.carona.network.NetworkHelper;
  */
 
 public class Vehicle implements Serializable {
-
-//    Vehicle types
+    //    Vehicle types
     public static final int VEHICLE_TYPE_CAR = 1;
     public static final int VEHICLE_TYPE_MOTO = 2;
 
@@ -40,7 +39,7 @@ public class Vehicle implements Serializable {
             this.type = json.getInt("v_vehicle_type");
             this.brand = json.getString("v_brand");
             this.model = json.getString("v_model");
-            if(json.getInt("v_air") == 1){
+            if (json.getInt("v_air") == 1) {
                 this.air = true;
             }
             this.numDoors = json.getInt("v_num_doors");
@@ -48,12 +47,12 @@ public class Vehicle implements Serializable {
             this.plate = json.getString("v_plate");
             this.colorName = json.getString("v_color_name");
             this.colorHex = json.getString("v_color_hex");
-            if(json.getInt("v_default") == 1){
+            if (json.getInt("v_default") == 1) {
                 this.isDefault = true;
             }
-            this.mainPhotoUrl =  NetworkHelper.DOMINIO + json.getString("v_main_photo_url");
+            this.mainPhotoUrl = NetworkHelper.DOMINIO + json.getString("v_main_photo_url");
 
-            if(!json.isNull("v_gallery")) {
+            if (!json.isNull("v_gallery")) {
                 this.gallery = new ArrayList<>();
                 JSONArray gallery = json.getJSONArray("v_gallery");
                 for (int i = 0; i < gallery.length(); i++) {
@@ -171,5 +170,9 @@ public class Vehicle implements Serializable {
 
     public void setDefault(boolean aDefault) {
         isDefault = aDefault;
+    }
+
+    public boolean hasMainPhotoUrl() {
+        return !(getMainPhotoUrl() == null || getMainPhotoUrl().equals("http://10.1.1.103/caronauesc-web/null") || getMainPhotoUrl().isEmpty());
     }
 }

@@ -29,10 +29,8 @@
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/ivProfile"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_below="@+id/view"
-                    android:layout_centerHorizontal="true"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
                     android:layout_marginTop="10dp"
                     android:src="@drawable/ic_profile_placeholder"
                     android:visibility="gone"
@@ -41,18 +39,27 @@
 
                 <com.facebook.drawee.view.SimpleDraweeView
                     android:id="@+id/ivUrlProfile"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:scaleType="fitXY"
                     app:placeholderImage="@drawable/ic_profile_placeholder" />
 
                 <ImageButton
                     android:id="@+id/btGetImage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_gravity="bottom|end"
                     android:background="@drawable/circular_button"
-                    android:padding="7dp"
+                    android:scaleType="fitXY"
                     android:src="@drawable/ic_plus_circle" />
+                <ImageButton
+                    android:id="@+id/btRemoveImage"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="bottom|start"
+                    android:background="@drawable/circular_button"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_close_circle" />
             </FrameLayout>
 
             <android.support.design.widget.TextInputLayout

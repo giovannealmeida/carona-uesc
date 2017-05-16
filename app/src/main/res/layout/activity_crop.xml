@@ -12,7 +12,9 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="@drawable/circular_button"
+        android:tint="@color/colorButton"
         android:src="@drawable/ic_check_circle"
+        android:scaleType="fitXY"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp" />

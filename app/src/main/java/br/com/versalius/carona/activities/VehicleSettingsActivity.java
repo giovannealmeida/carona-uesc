@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -75,6 +76,9 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
     private EditText etPlate;
     private EditText etColorName;
 
+    private ImageButton btRemoveImage;
+    private ImageButton btGetImage;
+
     private SwitchCompat swAirConditioner;
     private Spinner spNumDoors;
     private Spinner spNumSits;
@@ -119,6 +123,11 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
     }
 
     private void setData(Vehicle vehicle) {
+        if (vehicle.hasMainPhotoUrl()) {
+            btGetImage.setVisibility(View.GONE);
+            btRemoveImage.setVisibility(View.VISIBLE);
+        }
+
         formData.put("vehicle_id", String.valueOf(vehicle.getId()));
         getSupportActionBar().setTitle(R.string.title_edit_vehicle);
 
@@ -179,7 +188,7 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
         ivUrlVehicle.getHierarchy().setRoundingParams(roundingParams);
 
         /* Pegar imagem */
-        ImageButton btGetImage = (ImageButton) findViewById(R.id.btGetImage);
+        btGetImage = (ImageButton) findViewById(R.id.btGetImage);
         btGetImage.setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
@@ -196,6 +205,24 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
                         ActivityCompat.requestPermissions(VehicleSettingsActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_CODE);
                     }
                 }
+            }
+        });
+
+        btRemoveImage = (ImageButton) findViewById(R.id.btRemoveImage);
+        btRemoveImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ivUrlVehicle.getVisibility() == View.VISIBLE) {
+                    ivUrlVehicle.setVisibility(View.GONE);
+                    ivUrlVehicle.setImageURI("");
+                }
+                ivVehicleMainPic.setVisibility(View.VISIBLE);
+                ivVehicleMainPic.setImageBitmap(BitmapFactory.decodeResource(VehicleSettingsActivity.this.getResources(),
+                        R.drawable.ic_empty_vehicle_list));
+                btRemoveImage.setVisibility(View.GONE);
+                btGetImage.setVisibility(View.VISIBLE);
+
+                formData.put("image", " ");
             }
         });
 
@@ -590,6 +617,8 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
         ivVehicleMainPic.setImageBitmap(bitmap);
         ivVehicleMainPic.setVisibility(View.VISIBLE);
         ivUrlVehicle.setVisibility(View.GONE);
+        ivUrlVehicle.setImageURI("");
+        btRemoveImage.setVisibility(View.VISIBLE);
 
         /* Codifica a imagem pra envio */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
