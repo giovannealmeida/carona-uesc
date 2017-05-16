@@ -29,6 +29,7 @@ import static android.app.Activity.RESULT_OK;
 public class ChangeVehicleFragment extends Fragment {
 
     private static final int ACTION_ADD_VEHICLE = 1000;
+    public static final int ACTION_EDIT_VEHICLE = 1001;
 
     //Listeners
     private MessageDeliveredListener messageDeliveredListener;
@@ -72,7 +73,7 @@ public class ChangeVehicleFragment extends Fragment {
         rvVehicles.setLayoutManager(manager);
         List<Vehicle> list = loadVehicles();
         //Seta o adapter mesmo a lista sendo null. Se um veículo for adicionado só é preciso chamar notifyDatasetChaged()
-        adapter = new VehicleAdapter(list, getActivity(), new OnVehicleListChanged() {
+        adapter = new VehicleAdapter(list, getActivity(), this, new OnVehicleListChanged() {
             @Override
             public void onVehicleAdded(Vehicle vehicle) {
                 //Nunca acontece dentro do adapter
@@ -178,10 +179,14 @@ public class ChangeVehicleFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
-        if (requestCode == ACTION_ADD_VEHICLE) {
+        if ((requestCode == ACTION_ADD_VEHICLE) || (requestCode == ACTION_EDIT_VEHICLE)) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                adapter.addItem((Vehicle)data.getSerializableExtra("vehicle"));
+                Vehicle vehicle = (Vehicle)data.getSerializableExtra("vehicle");
+                if(vehicle.isDefault()){
+                    userUpdateListener.OnVehicleUpdate(vehicle);
+                }
+                adapter.addItem(vehicle);
                 checkListChanges();
             }
         }

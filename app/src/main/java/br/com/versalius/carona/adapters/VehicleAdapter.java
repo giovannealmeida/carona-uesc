@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,8 @@ import br.com.versalius.carona.utils.CustomSnackBar;
 import br.com.versalius.carona.utils.DBHelper;
 import br.com.versalius.carona.utils.ProgressDialogHelper;
 
+import static br.com.versalius.carona.fragments.ChangeVehicleFragment.ACTION_EDIT_VEHICLE;
+
 /**
  * Created by Giovanne on 03/12/2016.
  */
@@ -50,12 +53,14 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
     private LayoutInflater inflater;
     private RecycleViewOnItemClickListener onItemClickListener;
     private Context context;
+    private Fragment fragment;
     private int currentDefaultVehiclePosition = -1;
 
-    public VehicleAdapter(List<Vehicle> list, Context context, ChangeVehicleFragment.OnVehicleListChanged onVehicleListChanged) {
+    public VehicleAdapter(List<Vehicle> list, Context context, Fragment fragment, ChangeVehicleFragment.OnVehicleListChanged onVehicleListChanged) {
         this.list = list;
         this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.context = context;
+        this.fragment = fragment;
         if (context instanceof UserUpdateListener) {
             userUpdateListener = (UserUpdateListener) context;
         }
@@ -93,7 +98,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         holder.btIsNotDefault.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(currentDefaultVehiclePosition >= 0) { //Se existe um veículo default
+                if (currentDefaultVehiclePosition >= 0) { //Se existe um veículo default
                     updateMainVehicle(list.get(currentDefaultVehiclePosition), list.get((int) view.getTag()), (int) view.getTag());
                 } else { //Se não existe um veículo default
                     updateMainVehicle(null, list.get((int) view.getTag()), (int) view.getTag());
@@ -151,7 +156,9 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
         holder.btEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                context.startActivity(new Intent(context, VehicleSettingsActivity.class).putExtra("vehicle",list.get(position)));
+                fragment.startActivityForResult(new Intent(context, VehicleSettingsActivity.class).putExtra("vehicle", list.get(position)), ACTION_EDIT_VEHICLE);
+
+//                context.startActivity(new Intent(context, VehicleSettingsActivity.class).putExtra("vehicle",list.get(position)));
             }
         });
     }
@@ -185,7 +192,7 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
                         ContentValues cv = new ContentValues();
                         DBHelper helper = DBHelper.getInstance(context);
                         SQLiteDatabase db = helper.getDatabase();
-                        if(previousMainVehicle != null) {
+                        if (previousMainVehicle != null) {
                             cv.put("is_default", 0);
                             db.update(DBHelper.TBL_VEHICLE, cv, null, null);
                             previousMainVehicle.setDefault(false);
@@ -238,9 +245,19 @@ public class VehicleAdapter extends RecyclerView.Adapter<VehicleAdapter.ViewHold
     }
 
     public void addItem(Vehicle vehicle) {
-        if(list == null){//O usuario nao possui veículo algum
+        if (list == null) {//O usuario nao possui veículo algum
             list = new ArrayList<>();
         }
+        //busca pelo veículo na lista
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId() == vehicle.getId()) {
+                //Se encontrou, substitui, recostroi a lista e retorna
+                list.set(i, vehicle);
+                notifyDataSetChanged();
+                return;
+            }
+        }
+        //se não encontrou ao fim do laço, adiciona o novo item e reconstroi a lista
         list.add(vehicle);
         notifyDataSetChanged();
     }

@@ -119,6 +119,7 @@ public class VehicleSettingsActivity extends AppCompatActivity implements View.O
     }
 
     private void setData(Vehicle vehicle) {
+        formData.put("vehicle_id", String.valueOf(vehicle.getId()));
         getSupportActionBar().setTitle(R.string.title_edit_vehicle);
 
         ivUrlVehicle.setImageURI(Uri.parse(vehicle.getMainPhotoUrl()));
