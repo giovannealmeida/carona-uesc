@@ -18,7 +18,7 @@ import br.com.versalius.carona.network.NetworkHelper;
  * Created by Giovanne on 03/12/2016.
  */
 
-public class User implements Serializable{
+public class User implements Serializable {
 
     public static int GENDER_MALE = 1;
     public static int GENDER_FEMALE = 2;
@@ -45,64 +45,63 @@ public class User implements Serializable{
     private boolean showPhone;
     private boolean showWhatsapp;
 
-    public  User (JSONObject json) {
+    public User(JSONObject json) {
         try {
             this.id = json.getInt("u_id");
-            if(!json.isNull("u_vehicles")) {
+            if (!json.isNull("u_vehicles")) {
                 JSONArray vehicles = json.getJSONArray("u_vehicles");
                 this.vehicles = new ArrayList<>();
                 for (int i = 0; i < vehicles.length(); i++) {
                     this.vehicles.add(new Vehicle(vehicles.getJSONObject(i)));
                 }
             }
-            this.firstName = json.optString("u_first_name","User");
-            this.lastName = json.optString("u_last_name","");
+            this.firstName = json.optString("u_first_name", "User");
+            this.lastName = json.optString("u_last_name", "");
             this.genderId = json.getInt("u_gender_id");
-            if(!json.getString("u_phone").equals("null")) {
+            if (!json.getString("u_phone").equals("null")) {
                 this.phone = json.optString("u_phone", "");
             }
 
-            if(!json.getString("u_whatsapp").equals("null")) {
+            if (!json.getString("u_whatsapp").equals("null")) {
                 this.whatsapp = json.optString("u_whatsapp", "");
             }
 
-            this.city = json.optString("u_city","");
-            this.neighborhood = json.optString("u_neighborhood","");
+            this.city = json.optString("u_city", "");
+            this.neighborhood = json.optString("u_neighborhood", "");
             this.birthDate = Calendar.getInstance();
-            this.birthDate.setTime(new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(json.optString("u_birth_date","")));
-            this.email = json.optString("u_email","");
-            this.password = json.optString("u_password","");
-            if(!json.isNull("u_pic_path")) {
-                this.photoUrl = NetworkHelper.DOMINIO + json.getString("u_pic_path");
-            }
+            this.birthDate.setTime(new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(json.optString("u_birth_date", "")));
+            this.email = json.optString("u_email", "");
+            this.password = json.optString("u_password", "");
+            
+            this.photoUrl = NetworkHelper.DOMINIO + json.getString("u_pic_path");
 
             JSONObject prefs = json.getJSONObject("u_prefs");
-            if(prefs.getInt("up_show_email") == 1) {
+            if (prefs.getInt("up_show_email") == 1) {
                 this.showEmail = true;
             }
-            if(prefs.getInt("up_show_birthday") == 1) {
+            if (prefs.getInt("up_show_birthday") == 1) {
                 this.showBirthday = true;
             }
-            if(prefs.getInt("up_show_city") == 1) {
+            if (prefs.getInt("up_show_city") == 1) {
                 this.showCity = true;
             }
-            if(prefs.getInt("up_show_neighborhood") == 1) {
+            if (prefs.getInt("up_show_neighborhood") == 1) {
                 this.showNeighborhood = true;
             }
-            if(prefs.getInt("up_show_phone") == 1) {
+            if (prefs.getInt("up_show_phone") == 1) {
                 this.showPhone = true;
             }
-            if(prefs.getInt("up_show_whatsapp") == 1) {
+            if (prefs.getInt("up_show_whatsapp") == 1) {
                 this.showWhatsapp = true;
             }
 
-        } catch (JSONException | ParseException e){
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
     }
 
-    public Vehicle getActiveCar(){
-        if(vehicles != null) {
+    public Vehicle getActiveCar() {
+        if (vehicles != null) {
             for (Vehicle vehicle : vehicles) {
                 if (vehicle.isDefault()) {
                     return vehicle;
@@ -148,7 +147,7 @@ public class User implements Serializable{
         return birthDate;
     }
 
-    public String getFormattedBirthday(String format){
+    public String getFormattedBirthday(String format) {
         SimpleDateFormat s = new SimpleDateFormat(format);
         return s.format(getBirthDate().getTime());
     }

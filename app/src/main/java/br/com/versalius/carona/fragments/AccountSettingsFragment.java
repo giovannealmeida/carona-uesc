@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,6 +56,7 @@ import java.util.Locale;
 
 import br.com.versalius.carona.R;
 import br.com.versalius.carona.activities.CropActivity;
+import br.com.versalius.carona.activities.VehicleSettingsActivity;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
 import br.com.versalius.carona.models.User;
@@ -111,6 +113,8 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
 
     private static final int ACTION_RESULT_GET_IMAGE = 1000;
     private static final int REQUEST_PERMISSION_CODE = 1001;
+    private ImageButton btGetImage;
+    private ImageButton btRemoveImage;
 
     public static AccountSettingsFragment newInstance() {
         return new AccountSettingsFragment();
@@ -137,20 +141,9 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         PreferencesHelper pref = PreferencesHelper.getInstance(getActivity());
 
         formData.put("user_id", pref.load(PreferencesHelper.USER_ID));
-        ivProfile = (CircleImageView) rootView.findViewById(R.id.ivProfile);
-        ivUrlProfile = (SimpleDraweeView) rootView.findViewById(R.id.ivUrlProfile);
-        Uri uri = Uri.parse(pref.load(PreferencesHelper.USER_IMAGE_URL));
-        if (!uri.toString().isEmpty() && !uri.toString().equals("null")) {
-            ivUrlProfile.setImageURI(uri);
-            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
-            roundingParams.setRoundAsCircle(true);
-            ivUrlProfile.getHierarchy().setRoundingParams(roundingParams);
-        } else {
-            ivUrlProfile.setVisibility(View.GONE);
-            ivProfile.setVisibility(View.VISIBLE);
-        }
+
         /* Pegar imagem */
-        ImageButton btGetImage = (ImageButton) rootView.findViewById(R.id.btGetImage);
+        btGetImage = (ImageButton) rootView.findViewById(R.id.btGetImage);
         btGetImage.setOnClickListener(new View.OnClickListener() {
             @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
@@ -169,6 +162,39 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
                 }
             }
         });
+
+        btRemoveImage = (ImageButton) rootView.findViewById(R.id.btRemoveImage);
+        btRemoveImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ivUrlProfile.getVisibility() == View.VISIBLE) {
+                    ivUrlProfile.setVisibility(View.GONE);
+                    ivUrlProfile.setImageURI("");
+                }
+                ivProfile.setVisibility(View.VISIBLE);
+                ivProfile.setImageBitmap(BitmapFactory.decodeResource(AccountSettingsFragment.this.getResources(),
+                        R.drawable.ic_profile_placeholder));
+                btRemoveImage.setVisibility(View.GONE);
+                btGetImage.setVisibility(View.VISIBLE);
+
+                formData.put("image", " ");
+            }
+        });
+
+        ivProfile = (CircleImageView) rootView.findViewById(R.id.ivProfile);
+        ivUrlProfile = (SimpleDraweeView) rootView.findViewById(R.id.ivUrlProfile);
+        Uri uri = Uri.parse(pref.load(PreferencesHelper.USER_IMAGE_URL));
+        if (!uri.toString().isEmpty() && !uri.toString().equals("null")) {
+            ivUrlProfile.setImageURI(uri);
+            RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+            roundingParams.setRoundAsCircle(true);
+            ivUrlProfile.getHierarchy().setRoundingParams(roundingParams);
+            btRemoveImage.setVisibility(View.VISIBLE);
+            btGetImage.setVisibility(View.GONE);
+        } else {
+            ivUrlProfile.setVisibility(View.GONE);
+            ivProfile.setVisibility(View.VISIBLE);
+        }
 
         tvRgErrMessage = (TextView) rootView.findViewById(R.id.tvRgErrMessage);
         /* Instanciando layouts */
@@ -595,6 +621,8 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         ivProfile.setImageBitmap(bitmap);
         ivProfile.setVisibility(View.VISIBLE);
         ivUrlProfile.setVisibility(View.GONE);
+        ivUrlProfile.setImageURI("");
+        btRemoveImage.setVisibility(View.VISIBLE);
 
         /* Codifica a imagem pra envio */
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
