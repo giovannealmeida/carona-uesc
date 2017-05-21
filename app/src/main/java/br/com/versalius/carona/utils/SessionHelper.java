@@ -67,6 +67,10 @@ public class SessionHelper {
         return PreferencesHelper.getInstance(context).load(PreferencesHelper.USER_LAST_NAME);
     }
 
+    public String getUserFullName(){
+        return getUserFirstName()+" "+getUserLastName();
+    }
+
     public String getUserId() {
 //        return PreferencesHelper.getInstance(context).load(PreferencesHelper.USER_ID);
         String userId = "";

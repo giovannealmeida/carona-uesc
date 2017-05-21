@@ -49,8 +49,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -183,9 +185,10 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
 
         ivProfile = (CircleImageView) rootView.findViewById(R.id.ivProfile);
         ivUrlProfile = (SimpleDraweeView) rootView.findViewById(R.id.ivUrlProfile);
-        Uri uri = Uri.parse(pref.load(PreferencesHelper.USER_IMAGE_URL));
-        if (!uri.toString().isEmpty() && !uri.toString().equals("null")) {
-            ivUrlProfile.setImageURI(uri);
+//        Uri uri = Uri.parse(pref.load(PreferencesHelper.USER_IMAGE_URL));
+//        if (!uri.toString().isEmpty() && !uri.toString().equals("null")) {
+        if (!pref.load(PreferencesHelper.USER_IMAGE_URL).equals(NetworkHelper.DOMINIO+"null")) {
+            ivUrlProfile.setImageURI(Uri.parse(pref.load(PreferencesHelper.USER_IMAGE_URL)));
             RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
             roundingParams.setRoundAsCircle(true);
             ivUrlProfile.getHierarchy().setRoundingParams(roundingParams);
@@ -194,6 +197,8 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         } else {
             ivUrlProfile.setVisibility(View.GONE);
             ivProfile.setVisibility(View.VISIBLE);
+            btRemoveImage.setVisibility(View.GONE);
+            btGetImage.setVisibility(View.VISIBLE);
         }
 
         tvRgErrMessage = (TextView) rootView.findViewById(R.id.tvRgErrMessage);
@@ -298,7 +303,14 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
 
         /**** Seta o comportamento do DatePicker ****/
         final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-        Calendar nowCalendar = Calendar.getInstance();
+
+        Calendar birthDate = Calendar.getInstance();
+        try {
+            birthDate.setTime(dateFormatter.parse(pref.load(PreferencesHelper.USER_BIRTHDAY)));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         final DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
 
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -307,10 +319,10 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
                 etBirthday.setText(dateFormatter.format(newDate.getTime()));
             }
 
-        }, nowCalendar.get(Calendar.YEAR), nowCalendar.get(Calendar.MONTH), nowCalendar.get(Calendar.DAY_OF_MONTH));
+        }, birthDate.get(Calendar.YEAR), birthDate.get(Calendar.MONTH), birthDate.get(Calendar.DAY_OF_MONTH));
 
         etBirthday.setInputType(InputType.TYPE_NULL);
-        etBirthday.setText(dateFormatter.format(nowCalendar.getTime()));
+        etBirthday.setText(pref.load(PreferencesHelper.USER_BIRTHDAY));
         //Abre o Date Picker com click (só funciona se o campo tiver foco)
         etBirthday.setOnClickListener(new View.OnClickListener() {
             @Override

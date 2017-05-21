@@ -33,11 +33,13 @@ import br.com.versalius.carona.activities.LoginActivity;
 import br.com.versalius.carona.fragments.AccountSettingsFragment;
 import br.com.versalius.carona.fragments.AvailableRidesFragment;
 import br.com.versalius.carona.fragments.ChangeVehicleFragment;
+import br.com.versalius.carona.fragments.ProfileFragment;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
 import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.models.Vehicle;
 import br.com.versalius.carona.utils.CustomSnackBar;
+import br.com.versalius.carona.utils.PreferencesHelper;
 import br.com.versalius.carona.utils.SessionHelper;
 
 public class MainActivity extends AppCompatActivity
@@ -196,7 +198,8 @@ public class MainActivity extends AppCompatActivity
             toolbar.setTitle(getString(R.string.title_fragment_available_rides));
             showFragment(AvailableRidesFragment.newInstance());
         } else if (id == R.id.nav_my_profile) {
-
+            toolbar.setTitle(new SessionHelper(this).getUserFullName()+" (você)");
+            showFragment(ProfileFragment.newInstance());
         } else if (id == R.id.nav_my_ride) {
 
         } else if (id == R.id.nav_change_vehicle) {

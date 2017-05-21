@@ -72,7 +72,7 @@ public class User implements Serializable {
             this.birthDate.setTime(new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(json.optString("u_birth_date", "")));
             this.email = json.optString("u_email", "");
             this.password = json.optString("u_password", "");
-            
+
             this.photoUrl = NetworkHelper.DOMINIO + json.getString("u_pic_path");
 
             JSONObject prefs = json.getJSONObject("u_prefs");
