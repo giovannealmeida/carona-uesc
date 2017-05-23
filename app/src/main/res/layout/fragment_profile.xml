@@ -140,10 +140,19 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
+                    android:textSize="16dp"
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="Guarita"
                     android:textColor="@android:color/black" />
+                <TextView
+                    android:id="@+id/tvComplement"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:text="Complemento a respeito do endereço de origem"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -167,6 +176,7 @@
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
                     android:gravity="center_vertical"
+                    android:textSize="16dp"
                     android:maxLines="1"
                     android:text="N. Sra da Vitoria - Ilhéus"
                     android:textColor="@android:color/black" />
@@ -202,6 +212,7 @@
                         android:ellipsize="end"
                         android:gravity="center_vertical"
                         android:maxLines="1"
+                        android:textSize="16dp"
                         android:text="Fusca - Volkswagen"
                         android:textColor="@android:color/black" />
 
@@ -248,6 +259,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
+                    android:textSize="16dp"
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="18:30"

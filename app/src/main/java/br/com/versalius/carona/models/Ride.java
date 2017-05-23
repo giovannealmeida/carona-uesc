@@ -35,6 +35,8 @@ public class Ride implements Serializable {
     private int id;
     private User driver;
     private List<User> passengers;
+    private int numPassengers;
+    private int availableSits;
     private int status;
     private Origin origin;
     private String destinationCity;
@@ -44,14 +46,22 @@ public class Ride implements Serializable {
     public Ride(JSONObject json) {
         try {
             this.id = json.getInt("r_id");
-            this.driver = new User(json.getJSONObject("r_driver"));
-            if (!json.isNull("r_passengers")) {
+            if (json.has("r_driver")) {
+                this.driver = new User(json.getJSONObject("r_driver"));
+            }
+            //Ao mostrar o feed não se utiliza informações sobre passageiros...
+            if (json.has("r_passengers") && !json.isNull("r_passengers")) {
+                this.numPassengers = 0;
                 JSONArray passengers = json.getJSONArray("r_passengers");
                 this.passengers = new ArrayList<>();
                 for (int i = 0; i < passengers.length(); i++) {
                     this.passengers.add(new User(passengers.getJSONObject(i)));
+                    this.numPassengers++;
                 }
+            } else { //... apenas a quantidade
+                this.numPassengers = json.getInt("num_passengers");
             }
+            this.availableSits = json.getInt("r_available_sits_num");
             this.status = json.getInt("r_status_id");
             this.origin = new Origin(json.getJSONObject("r_origin"));
             this.destinationCity = json.getString("r_destination_city");
@@ -80,8 +90,9 @@ public class Ride implements Serializable {
     }
 
     public int getAvailableSits() {
-        int numPassengers = getPassengers() == null ? 0 : getPassengers().size();
-        return getDriver().getActiveCar().getNumSits() - numPassengers;
+//        int numPassengers = getPassengers() == null ? 0 : getPassengers().size();
+//        return getDriver().getActiveCar().getNumSits() - numPassengers;
+        return availableSits - numPassengers;
     }
 
     public String getOrigin() {
@@ -107,5 +118,22 @@ public class Ride implements Serializable {
 
     public String getFullDestination() {
         return getDestinationNeighborhood() + " - " + getDestinationCity();
+    }
+
+    public void addPassenger(User passenger) {
+        if (this.passengers == null)
+            passengers = new ArrayList<>();
+
+        this.passengers.add(passenger);
+        this.numPassengers++;
+    }
+
+    public void removePassengerById(int passengerId) {
+        if (passengers != null)
+            for (User passenger : passengers)
+                if (passenger.getId() == passengerId) {
+                    passengers.remove(passenger);
+                    numPassengers--;
+                }
     }
 }

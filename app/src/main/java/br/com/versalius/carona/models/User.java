@@ -47,8 +47,10 @@ public class User implements Serializable {
 
     public User(JSONObject json) {
         try {
-            this.id = json.getInt("u_id");
-            if (!json.isNull("u_vehicles")) {
+            if(json.has("u_id")) {
+                this.id = json.getInt("u_id");
+            }
+            if (json.has("u_vehicles") && !json.isNull("u_vehicles")) {
                 JSONArray vehicles = json.getJSONArray("u_vehicles");
                 this.vehicles = new ArrayList<>();
                 for (int i = 0; i < vehicles.length(); i++) {
@@ -57,42 +59,60 @@ public class User implements Serializable {
             }
             this.firstName = json.optString("u_first_name", "User");
             this.lastName = json.optString("u_last_name", "");
-            this.genderId = json.getInt("u_gender_id");
-            if (!json.getString("u_phone").equals("null")) {
+            if(json.has("u_gender_id")) {
+                this.genderId = json.getInt("u_gender_id");
+            }
+            if (json.has("u_phone") && !json.getString("u_phone").equals("null")) {
                 this.phone = json.optString("u_phone", "");
             }
 
-            if (!json.getString("u_whatsapp").equals("null")) {
+            if (json.has("u_whatsapp") && !json.getString("u_whatsapp").equals("null")) {
                 this.whatsapp = json.optString("u_whatsapp", "");
             }
 
-            this.city = json.optString("u_city", "");
-            this.neighborhood = json.optString("u_neighborhood", "");
-            this.birthDate = Calendar.getInstance();
-            this.birthDate.setTime(new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(json.optString("u_birth_date", "")));
-            this.email = json.optString("u_email", "");
-            this.password = json.optString("u_password", "");
+            if(json.has("u_city")) {
+                this.city = json.optString("u_city", "");
+            }
+            if(json.has("u_neighborhood")) {
+                this.neighborhood = json.optString("u_neighborhood", "");
+            }
+            if(json.has("u_birth_date")) {
+                this.birthDate = Calendar.getInstance();
+                this.birthDate.setTime(new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(json.optString("u_birth_date", "")));
+            }
+            if(json.has("u_email")) {
+                this.email = json.optString("u_email", "");
+            }
+            if(json.has("u_password")) {
+                this.password = json.optString("u_password", "");
+            }
+            if(json.has("u_pic_path")) {
+                this.photoUrl = NetworkHelper.DOMINIO + json.getString("u_pic_path");
+            }
 
-            this.photoUrl = NetworkHelper.DOMINIO + json.getString("u_pic_path");
+            if(json.has("u_prefs")) {
+                JSONObject prefs = json.getJSONObject("u_prefs");
+                if (prefs.getInt("up_show_email") == 1) {
+                    this.showEmail = true;
+                }
+                //TODO: Testar forma alternativa
+//                this.showEmail = prefs.getInt("up_show_email") == 1;
 
-            JSONObject prefs = json.getJSONObject("u_prefs");
-            if (prefs.getInt("up_show_email") == 1) {
-                this.showEmail = true;
-            }
-            if (prefs.getInt("up_show_birthday") == 1) {
-                this.showBirthday = true;
-            }
-            if (prefs.getInt("up_show_city") == 1) {
-                this.showCity = true;
-            }
-            if (prefs.getInt("up_show_neighborhood") == 1) {
-                this.showNeighborhood = true;
-            }
-            if (prefs.getInt("up_show_phone") == 1) {
-                this.showPhone = true;
-            }
-            if (prefs.getInt("up_show_whatsapp") == 1) {
-                this.showWhatsapp = true;
+                if (prefs.getInt("up_show_birthday") == 1) {
+                    this.showBirthday = true;
+                }
+                if (prefs.getInt("up_show_city") == 1) {
+                    this.showCity = true;
+                }
+                if (prefs.getInt("up_show_neighborhood") == 1) {
+                    this.showNeighborhood = true;
+                }
+                if (prefs.getInt("up_show_phone") == 1) {
+                    this.showPhone = true;
+                }
+                if (prefs.getInt("up_show_whatsapp") == 1) {
+                    this.showWhatsapp = true;
+                }
             }
 
         } catch (JSONException | ParseException e) {

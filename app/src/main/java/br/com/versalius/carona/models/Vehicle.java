@@ -35,24 +35,44 @@ public class Vehicle implements Serializable {
 
     public Vehicle(JSONObject json) {
         try {
-            this.id = json.getInt("v_id");
-            this.type = json.getInt("v_vehicle_type");
-            this.brand = json.getString("v_brand");
-            this.model = json.getString("v_model");
-            if (json.getInt("v_air") == 1) {
+            if (json.has("v_id")) {
+                this.id = json.getInt("v_id");
+            }
+            if (json.has("v_vehicle_type")) {
+                this.type = json.getInt("v_vehicle_type");
+            }
+            if (json.has("v_brand")) {
+                this.brand = json.getString("v_brand");
+            }
+            if (json.has("v_model")) {
+                this.model = json.getString("v_model");
+            }
+            if (json.has("v_air") && json.getInt("v_air") == 1) {
                 this.air = true;
             }
-            this.numDoors = json.getInt("v_num_doors");
-            this.numSits = json.getInt("v_num_sit");
-            this.plate = json.getString("v_plate");
-            this.colorName = json.getString("v_color_name");
-            this.colorHex = json.getString("v_color_hex");
-            if (json.getInt("v_default") == 1) {
+            if (json.has("v_num_doors")) {
+                this.numDoors = json.getInt("v_num_doors");
+            }
+            if (json.has("v_num_sit")) {
+                this.numSits = json.getInt("v_num_sit");
+            }
+            if (json.has("v_plate")) {
+                this.plate = json.getString("v_plate");
+            }
+            if (json.has("v_color_name")) {
+                this.colorName = json.getString("v_color_name");
+            }
+            if (json.has("v_color_hex")) {
+                this.colorHex = json.getString("v_color_hex");
+            }
+            if (json.has("v_default") && json.getInt("v_default") == 1) {
                 this.isDefault = true;
             }
-            this.mainPhotoUrl = NetworkHelper.DOMINIO + json.getString("v_main_photo_url");
+            if(json.has("v_main_photo_url")) {
+                this.mainPhotoUrl = NetworkHelper.DOMINIO + json.getString("v_main_photo_url");
+            }
 
-            if (!json.isNull("v_gallery")) {
+            if (json.has("v_gallery") && !json.isNull("v_gallery")) {
                 this.gallery = new ArrayList<>();
                 JSONArray gallery = json.getJSONArray("v_gallery");
                 for (int i = 0; i < gallery.length(); i++) {
