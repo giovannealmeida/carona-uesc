@@ -27,8 +27,9 @@ public class NetworkHelper {
     private static Context context;
     private RequestQueue requestQueue;
 
-//        public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
-    public static final String DOMINIO = "http://10.1.1.109/caronauesc-web/"; // Repo
+    public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
+//    public static final String DOMINIO = "http://10.1.1.109/caronauesc-web/"; // Repo
+    //public static final String DOMINIO = "http://10.66.7.16/caronauesc-web/"; // Repo UDO
 
     private final String API = "api/";
     /*UserService*/
@@ -40,6 +41,7 @@ public class NetworkHelper {
     private final String GET_USER = API + "UserService/get_user_by_id";
     /*RideService*/
     private final String GET_RIDES = API + "RideService/get_by_status";
+    private final String GET_RIDE_BY_ID = API + "RideService/get_by_id";
     /*VehicleService*/
     private final String UPDATE_DEFAULT_VEHICLE = API + "VehicleService/update_default";
     private final String INSERT_VEHICLE = API + "VehicleService/insert";
@@ -149,6 +151,17 @@ public class NetworkHelper {
                 callback);
     }
 
+    public void getRideById(String id, ResponseCallback callback) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put("id", id);
+
+        execute(Request.Method.GET,
+                null,
+                TAG,
+                buildGetURL(DOMINIO + GET_RIDE_BY_ID, params),
+                callback);
+    }
+
     public void getUserById(String id, ResponseCallback callback) {
         HashMap<String, String> params = new HashMap<>();
         params.put("id", id);
@@ -159,7 +172,7 @@ public class NetworkHelper {
                 callback);
     }
 
-    public void updateDefaultVehicle(String lastDefaultId,String newDefaultId, ResponseCallback callback) {
+    public void updateDefaultVehicle(String lastDefaultId, String newDefaultId, ResponseCallback callback) {
         HashMap<String, String> params = new HashMap<>();
         params.put("last_default_id", lastDefaultId);
         params.put("new_default_id", newDefaultId);
@@ -170,7 +183,7 @@ public class NetworkHelper {
                 callback);
     }
 
-    public void insertVehicle(HashMap<String,String> params, ResponseCallback callback) {
+    public void insertVehicle(HashMap<String, String> params, ResponseCallback callback) {
         execute(Request.Method.POST,
                 params,
                 TAG,
@@ -188,7 +201,7 @@ public class NetworkHelper {
                 callback);
     }
 
-    public void updateVehicle(HashMap<String,String> params, ResponseCallback callback) {
+    public void updateVehicle(HashMap<String, String> params, ResponseCallback callback) {
         execute(Request.Method.POST,
                 params,
                 TAG,

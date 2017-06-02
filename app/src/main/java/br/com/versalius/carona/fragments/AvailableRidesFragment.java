@@ -1,6 +1,7 @@
 package br.com.versalius.carona.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import br.com.versalius.carona.R;
+import br.com.versalius.carona.activities.ProfileActivity;
 import br.com.versalius.carona.adapters.RideAdapter;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
@@ -121,7 +123,8 @@ public class AvailableRidesFragment extends Fragment {
                         adapter.setOnItemClickListener(new RecycleViewOnItemClickListener() {
                             @Override
                             public void onItemClick(View v, int position) {
-                                Toast.makeText(getActivity(), "click: " + ((RideAdapter) recyclerView.getAdapter()).getDataset().get(position).getId(), Toast.LENGTH_LONG).show();
+                                startActivity(new Intent(getActivity(), ProfileActivity.class).putExtra("id",String.valueOf(((RideAdapter) recyclerView.getAdapter()).getDataset().get(position).getId())));
+                                //Toast.makeText(getActivity(), "click: " + ((RideAdapter) recyclerView.getAdapter()).getDataset().get(position).getId(), Toast.LENGTH_LONG).show();
                             }
                         });
 
