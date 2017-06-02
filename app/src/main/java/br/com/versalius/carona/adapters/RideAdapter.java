@@ -58,6 +58,8 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
         holder.tvAvailableSits.setText(String.valueOf(list.get(position).getAvailableSits()));
         if(list.get(position).getDriver().getActiveCar().getType() == Vehicle.VEHICLE_TYPE_MOTO){
             holder.tvAvailableSits.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_moto_black),null,null,null);
+        } else {
+            holder.tvAvailableSits.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(context,R.drawable.ic_car_black),null,null,null);
         }
 
         holder.tvOrigin.setText(list.get(position).getOrigin());
@@ -68,18 +70,26 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
 
         if(list.get(position).getDriver().getPhotoUrl() != null) {
             holder.ivProfile.setImageURI(list.get(position).getDriver().getPhotoUrl());
+        } else {
+            holder.ivProfile.setImageURI("");
         }
+
         if (list.get(position).getAvailableSits() == 0) {
             holder.btGetRide.setEnabled(false);
             holder.btGetRide.setText("Cheia");
-//            holder.btGetRide.setBackgroundColor(Color.GRAY);
             holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, android.R.color.darker_gray));
+        } else {
+            holder.btGetRide.setEnabled(true);
+            holder.btGetRide.setText("Entrar");
+            holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorButton));
         }
 
         if (isInRide(list.get(position).getId())) {
             holder.btGetRide.setText("Sair");
-//            holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary));
             holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorSecondary));
+        }else {
+            holder.btGetRide.setText("Entrar");
+            holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorButton));
         }
 
         holder.btGetRide.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +97,6 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
             public void onClick(View view) {
                 if (PreferencesHelper.getInstance(context).load("currentRideId").isEmpty()) {
                     holder.btGetRide.setText("Sair");
-//                    holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSecondary));
                     holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorSecondary));
                     try {
                         PreferencesHelper.getInstance(context).save(USER_CURRENT_RIDE_ID, String.valueOf(list.get(position).getId()));
@@ -96,7 +105,6 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.ViewHolder> {
                     }
                 } else if (isInRide(list.get(position).getId())) {
                     holder.btGetRide.setText("Entrar");
-//                    holder.btGetRide.setBackgroundColor(ContextCompat.getColor(context, R.color.colorButton));
                     holder.btGetRide.setSupportBackgroundTintList(ContextCompat.getColorStateList(context, R.color.colorButton));
 
                     try {
