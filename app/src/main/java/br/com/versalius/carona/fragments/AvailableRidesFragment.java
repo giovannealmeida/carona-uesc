@@ -1,7 +1,6 @@
 package br.com.versalius.carona.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -12,19 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.android.volley.VolleyError;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
-
 import br.com.versalius.carona.R;
-import br.com.versalius.carona.activities.ProfileActivity;
 import br.com.versalius.carona.adapters.RideAdapter;
+import br.com.versalius.carona.interfaces.AddFragmentAsActivity;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.RecycleViewOnItemClickListener;
 import br.com.versalius.carona.models.Ride;
@@ -123,8 +117,12 @@ public class AvailableRidesFragment extends Fragment {
                         adapter.setOnItemClickListener(new RecycleViewOnItemClickListener() {
                             @Override
                             public void onItemClick(View v, int position) {
-                                startActivity(new Intent(getActivity(), ProfileActivity.class).putExtra("id",String.valueOf(((RideAdapter) recyclerView.getAdapter()).getDataset().get(position).getId())));
-                                //Toast.makeText(getActivity(), "click: " + ((RideAdapter) recyclerView.getAdapter()).getDataset().get(position).getId(), Toast.LENGTH_LONG).show();
+                                Ride ride = ((RideAdapter) recyclerView.getAdapter()).getDataset().get(position);
+                                RideFragment fragment = RideFragment.newInstance();
+                                Bundle b = new Bundle();
+                                b.putString("user_id",String.valueOf(ride.getId()));
+                                fragment.setArguments(b);
+                                ((AddFragmentAsActivity)getActivity()).onAddFragment(fragment,ride.getDriver().getFullName());
                             }
                         });
 

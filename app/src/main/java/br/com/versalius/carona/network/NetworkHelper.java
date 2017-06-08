@@ -28,7 +28,7 @@ public class NetworkHelper {
     private RequestQueue requestQueue;
 
 //    public static final String DOMINIO = "http://carona-uesc.000webhostapp.com/"; // Remoto
-    public static final String DOMINIO = "http://10.1.1.107/caronauesc-web/"; // Repo
+    public static final String DOMINIO = "http://10.1.1.104/caronauesc-web/"; // Repo
     //public static final String DOMINIO = "http://10.66.7.16/caronauesc-web/"; // Repo UDO
 
     private final String API = "api/";

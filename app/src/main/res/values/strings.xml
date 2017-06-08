@@ -74,7 +74,7 @@
     <string name="err_msg_empty_last_name">Insira um sobrenome</string>
     <string name="err_msg_short_name">O nome deve conter 2 caracteres ou mais</string>
     <string name="err_msg_short_last_name">O sobrenome deve conter 2 caracteres ou mais</string>
-    <string name="err_msg_empty_city">Insira uma cidade</string>
+    <string name="err_msg_empty_city">Insira a cidade</string>
     <string name="err_msg_short_city">A cidade deve conter 4 caracteres ou mais</string>
     <string name="err_msg_short_neighborhood">O bairro deve conter 4 caratedes ou mais</string>
     <string name="err_msg_empty_neighborhood">Insira um bairro</string>
@@ -119,5 +119,9 @@
     <string name="success_removing_vehicle">Veículo removido com sucesso</string>
     <string name="failed_removing_vehicle">Falha ao remover veículo</string>
     <string name="title_edit_vehicle">Alterar veículo</string>
+    <string name="show_evaluations">VER AVALIAÇÕES</string>
+    <string name="ride_enter">Entrar</string>
+    <string name="ride_exit">Sair</string>
+    <string name="show_vehicle_details">VER DETALHES</string>
 
 </resources>

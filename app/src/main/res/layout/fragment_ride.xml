@@ -20,8 +20,7 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/activity_vertical_margin"
             android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:paddingTop="@dimen/activity_vertical_margin">
+            android:paddingRight="4dp">
 
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/ivUrlProfile"
@@ -31,6 +30,7 @@
                 app:placeholderImage="@drawable/ic_profile_placeholder" />
 
             <TextView
+                android:id="@+id/tvName"
                 android:layout_width="180dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
@@ -44,14 +44,13 @@
                 android:layout_height="wrap_content">
 
                 <View
-                    android:id="@+id/vCounter"
+                    android:id="@+id/vStarsCounter"
                     android:layout_width="50dp"
                     android:layout_height="20dp"
                     android:layout_centerVertical="true"
                     android:background="@color/colorPrimary" />
 
                 <ImageView
-                    android:id="@+id/ivStars"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -59,41 +58,23 @@
 
             </RelativeLayout>
 
-            <TextView
+            <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="center"-->
+            <!--android:maxLines="2"-->
+            <!--android:text="VER AVALIAÇÕES"-->
+            <!--android:textColor="@color/colorPrimary"-->
+            <!--android:textSize="12sp" />-->
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btShowEvaluations"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:maxLines="2"
-                android:text="VER AVALIAÇÕES"
-                android:textColor="@color/colorPrimary"
-                android:textSize="12sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Nome de Usuário está oferencendo carona!"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp" />
-
-                <android.support.v7.widget.AppCompatButton
-                    android:id="@+id/btGetRide"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Clique para entrar"
-                    android:textColor="@android:color/white"
-                    android:textSize="12sp"
-                    android:theme="@style/Widget.AppCompat.Button.Small"
-                    app:backgroundTint="@color/colorButton" />
-            </LinearLayout>
+                android:layout_gravity="center_horizontal"
+                android:background="?android:attr/selectableItemBackground"
+                android:text="@string/show_evaluations"
+                android:textColor="@color/colorPrimary" />
 
             <View
                 android:layout_width="match_parent"
@@ -140,11 +121,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
-                    android:textSize="16dp"
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="Guarita"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@android:color/black"
+                    android:textSize="16dp" />
+
                 <TextView
                     android:id="@+id/tvComplement"
                     android:layout_width="match_parent"
@@ -152,7 +134,7 @@
                     android:ellipsize="end"
                     android:gravity="center_vertical"
                     android:maxLines="1"
-                    android:text="Complemento a respeito do endereço de origem"/>
+                    android:text="Complemento a respeito do endereço de origem" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -176,12 +158,13 @@
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
                     android:gravity="center_vertical"
-                    android:textSize="16dp"
                     android:maxLines="1"
                     android:text="N. Sra da Vitoria - Ilhéus"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@android:color/black"
+                    android:textSize="16dp" />
 
                 <TextView
+                    android:id="@+id/tvVehicleType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -197,51 +180,60 @@
                     android:textSize="16sp" />
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/tvVehicleBrandAndModel"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:layout_marginRight="8dp"
                         android:ellipsize="end"
                         android:gravity="center_vertical"
                         android:maxLines="1"
-                        android:textSize="16dp"
                         android:text="Fusca - Volkswagen"
-                        android:textColor="@android:color/black" />
+                        android:textColor="@android:color/black"
+                        android:textSize="16dp" />
 
                     <TextView
                         android:id="@+id/tvAvailableSits"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:gravity="center_vertical"
                         android:maxLines="1"
                         android:text="3 vagas"
                         android:textColor="@color/colorAccent" />
+
+                    <android.support.v7.widget.AppCompatButton
+                        android:id="@+id/btShowVehicle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:text="@string/show_vehicle_details"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="12sp"
+                        android:layout_marginLeft="10dp" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:text="VER DETALHES"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="12sp" />
+                <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="4dp"-->
+                <!--android:layout_marginTop="4dp"-->
+                <!--android:gravity="center"-->
+                <!--android:maxLines="2"-->
+                <!--android:text="@string/show_vehicle_details"-->
+                <!--android:textColor="@color/colorPrimary"-->
+                <!--android:textSize="12sp" />-->
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:drawableLeft="@drawable/ic_clock"
                     android:drawablePadding="5dp"
                     android:drawableStart="@drawable/ic_clock"
@@ -259,11 +251,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:ellipsize="end"
-                    android:textSize="16dp"
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="18:30"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@android:color/black"
+                    android:textSize="16dp" />
             </LinearLayout>
 
             <View
@@ -338,19 +330,32 @@
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />
             </LinearLayout>
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btGetRide"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/ride_enter"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:theme="@style/Widget.AppCompat.Button.Small"
+                app:backgroundTint="@color/colorButton" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+
     <android.support.v4.widget.ContentLoadingProgressBar
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
         android:id="@+id/progressBar"
-        android:visibility="gone"
+        style="?android:progressBarStyleLarge"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="?android:progressBarStyleLarge"/>
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
     <FrameLayout
+        android:id="@+id/previewWarn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/previewWarn"
         android:background="#7000"
         android:padding="10dp">
 

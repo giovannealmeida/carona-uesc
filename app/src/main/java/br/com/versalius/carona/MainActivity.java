@@ -36,7 +36,7 @@ import br.com.versalius.carona.activities.LoginActivity;
 import br.com.versalius.carona.fragments.AccountSettingsFragment;
 import br.com.versalius.carona.fragments.AvailableRidesFragment;
 import br.com.versalius.carona.fragments.ChangeVehicleFragment;
-import br.com.versalius.carona.fragments.ProfileFragment;
+import br.com.versalius.carona.fragments.RideFragment;
 import br.com.versalius.carona.interfaces.AddFragmentAsActivity;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity
             showFragment(AvailableRidesFragment.newInstance());
 //        } else if (id == R.id.nav_my_profile) {
 //            toolbar.setTitle(new SessionHelper(this).getUserFullName()+" (você)");
-//            showFragment(ProfileFragment.newInstance());
+//            showFragment(RideFragment.newInstance());
         } else if (id == R.id.nav_my_ride) {
 
         } else if (id == R.id.nav_change_vehicle) {
@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity
                 onBackPressed();
             }
         });
-        if (fragment instanceof ProfileFragment) {
+        if (fragment instanceof RideFragment) {
             //Se for o fragmento de perfil, esconde tudo. Fica só o Home
             for (int i = 0; i < menu.size(); i++) {
                 menu.getItem(i).setVisible(false);

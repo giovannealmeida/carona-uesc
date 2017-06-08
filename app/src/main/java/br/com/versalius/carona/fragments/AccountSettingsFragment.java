@@ -18,7 +18,6 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.SwitchCompat;
@@ -54,13 +53,11 @@ import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
 import br.com.versalius.carona.R;
 import br.com.versalius.carona.activities.CropActivity;
-import br.com.versalius.carona.activities.VehicleSettingsActivity;
 import br.com.versalius.carona.interfaces.AddFragmentAsActivity;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
@@ -143,7 +140,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
     }
 
     private void setUpViews(View rootView) {
-        PreferencesHelper pref = PreferencesHelper.getInstance(getActivity());
+        final PreferencesHelper pref = PreferencesHelper.getInstance(getActivity());
 
         formData.put("user_id", pref.load(PreferencesHelper.USER_ID));
 
@@ -151,10 +148,7 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         btShowProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ProfileFragment fragment = ProfileFragment.newInstance();
-                Bundle b = new Bundle();
-                b.putString("parentTitle",getString(R.string.title_fragment_account));
-                fragment.setArguments(b);
+                RideFragment fragment = RideFragment.newInstance();
                 ((AddFragmentAsActivity)getActivity()).onAddFragment(fragment,new SessionHelper(getActivity()).getUserFullName() + " (você)");
             }
         });

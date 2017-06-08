@@ -99,6 +99,8 @@ public class Ride implements Serializable {
         return origin.getName();
     }
 
+    public String getOriginComplement(){ return origin.getComplement();}
+
     public String getDestinationCity() {
         return destinationCity;
     }
