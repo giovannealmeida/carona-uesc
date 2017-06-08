@@ -1,5 +1,6 @@
 package br.com.versalius.carona;
 
+import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity
     private String lastToolbarTitle = "";
     //Pra deixar os ícones do menu da Toolbar invisíveis
     private Menu menu;
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,12 +104,26 @@ public class MainActivity extends AppCompatActivity
 
         updateDrawerUserInfo(user);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    onBackPressed();
+                } else {
+                    if (drawer.isDrawerOpen(GravityCompat.START)) {
+                        drawer.closeDrawer(GravityCompat.START);
+                    } else {
+                        drawer.openDrawer(GravityCompat.START);
+                    }
+                }
+            }
+        });
         tvCurrentVehicle = (TextView) navHeader.findViewById(R.id.tvCurrentVehicle);
         updateDrawerVehicleInfo(user.getActiveCar());
     }
@@ -160,7 +177,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (fab.isOpened()) {
@@ -168,27 +184,38 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-
-        //Se mesmo depois do pop (que acontece no super.onBackPressed()) ainda houver fragmento no backstack...
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            //Não faz nada...
-//            toggle.setDrawerIndicatorEnabled(false);
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        } else {
-            if(!lastToolbarTitle.isEmpty()){
-                toolbar.setTitle(lastToolbarTitle);
-                lastToolbarTitle = "";
-            }
-            restoreToolbar();
+        if (!lastToolbarTitle.isEmpty()) {
+            toolbar.setTitle(lastToolbarTitle);
+            lastToolbarTitle = "";
         }
+        animateToolbarIcon(R.string.navigation_drawer_close);
+        restoreToolbar();
+    }
+
+    private void animateToolbarIcon(int action) {
+        ValueAnimator anim;
+        if(action == R.string.navigation_drawer_close){
+            anim = ValueAnimator.ofFloat(1, 0);
+        } else {
+            anim = ValueAnimator.ofFloat(0, 1);
+        }
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float slideOffset = (Float) valueAnimator.getAnimatedValue();
+                toggle.onDrawerSlide(drawer, slideOffset);
+            }
+        });
+        anim.setInterpolator(new DecelerateInterpolator());
+        anim.setDuration(200);
+        anim.start();
     }
 
     private void restoreToolbar() {
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        toggle.setDrawerIndicatorEnabled(true);
 
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         //Restaura ícones do menu
-        for (int i = 0; i < menu.size(); i++){
+        for (int i = 0; i < menu.size(); i++) {
             menu.getItem(i).setVisible(true);
         }
     }
@@ -224,10 +251,10 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         //Caso o usuário puxe o drawer de um fragmento que não está nele
         //A toolbar é restaurada...
-        restoreToolbar();
+//        restoreToolbar();
         //E o backstack é esvaziado
         FragmentManager fm = getSupportFragmentManager();
-        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+        for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
             fm.popBackStack();
         }
 
@@ -299,31 +326,28 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onAddFragment(Fragment fragment, String title) {
+        animateToolbarIcon(R.string.navigation_drawer_open);
         lastToolbarTitle = getSupportActionBar().getTitle().toString();
-
-        toggle.setDrawerIndicatorEnabled(false);
-        toggle.syncState();
-
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
         });
-        if(fragment instanceof ProfileFragment){
+        if (fragment instanceof ProfileFragment) {
             //Se for o fragmento de perfil, esconde tudo. Fica só o Home
-            for (int i = 0; i < menu.size(); i++){
+            for (int i = 0; i < menu.size(); i++) {
                 menu.getItem(i).setVisible(false);
             }
         }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setTitle(title);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_main,
-                fragment)
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.enter_from_right,R.anim.exit_to_left,R.anim.enter_from_left,R.anim.exit_to_right)
+                .replace(R.id.content_main,fragment)
                 .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }
 

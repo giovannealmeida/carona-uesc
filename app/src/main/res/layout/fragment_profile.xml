@@ -7,19 +7,7 @@
     android:background="@android:color/white"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="br.com.versalius.carona.MainActivity">
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/previewWarn"
-        android:background="#7000"
-        android:padding="10dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Pré-visualização de perfil"
-            android:textColor="@android:color/white" />
-    </FrameLayout>
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -359,4 +347,17 @@
         android:visibility="gone"
         android:layout_height="wrap_content"
         style="?android:progressBarStyleLarge"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/previewWarn"
+        android:background="#7000"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pré-visualização de perfil"
+            android:textColor="@android:color/white" />
+    </FrameLayout>
 </FrameLayout>
