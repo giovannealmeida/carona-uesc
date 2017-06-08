@@ -26,6 +26,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -54,8 +55,10 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 
+import br.com.versalius.carona.MainActivity;
 import br.com.versalius.carona.R;
 import br.com.versalius.carona.activities.CropActivity;
+import br.com.versalius.carona.interfaces.AddFragmentAsActivity;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
 import br.com.versalius.carona.models.User;
@@ -83,9 +86,9 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         return rootView;
     }
-
 }

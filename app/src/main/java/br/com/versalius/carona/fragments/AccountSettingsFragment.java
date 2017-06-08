@@ -18,7 +18,9 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.InputType;
@@ -59,6 +61,7 @@ import java.util.Locale;
 import br.com.versalius.carona.R;
 import br.com.versalius.carona.activities.CropActivity;
 import br.com.versalius.carona.activities.VehicleSettingsActivity;
+import br.com.versalius.carona.interfaces.AddFragmentAsActivity;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
 import br.com.versalius.carona.models.User;
@@ -143,6 +146,18 @@ public class AccountSettingsFragment extends Fragment implements View.OnFocusCha
         PreferencesHelper pref = PreferencesHelper.getInstance(getActivity());
 
         formData.put("user_id", pref.load(PreferencesHelper.USER_ID));
+
+        AppCompatButton btShowProfile = (AppCompatButton) rootView.findViewById(R.id.btShowProfile);
+        btShowProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ProfileFragment fragment = ProfileFragment.newInstance();
+                Bundle b = new Bundle();
+                b.putString("parentTitle",getString(R.string.title_fragment_account));
+                fragment.setArguments(b);
+                ((AddFragmentAsActivity)getActivity()).onAddFragment(fragment,new SessionHelper(getActivity()).getUserFullName() + " (você)");
+            }
+        });
 
         /* Pegar imagem */
         btGetImage = (ImageButton) rootView.findViewById(R.id.btGetImage);

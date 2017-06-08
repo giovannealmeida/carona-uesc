@@ -7,10 +7,10 @@
             android:checked="true"
             android:icon="@drawable/ic_thumb"
             android:title="@string/item_menu_available_rides" />
-        <item
-            android:id="@+id/nav_my_profile"
-            android:icon="@drawable/ic_account"
-            android:title="@string/item_menu_my_profile" />
+        <!--<item-->
+            <!--android:id="@+id/nav_my_profile"-->
+            <!--android:icon="@drawable/ic_account"-->
+            <!--android:title="@string/item_menu_my_profile" />-->
         <item
             android:id="@+id/nav_my_ride"
             android:icon="@drawable/ic_car_black"

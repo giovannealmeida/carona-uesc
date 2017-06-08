@@ -9,6 +9,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -34,19 +35,20 @@ import br.com.versalius.carona.fragments.AccountSettingsFragment;
 import br.com.versalius.carona.fragments.AvailableRidesFragment;
 import br.com.versalius.carona.fragments.ChangeVehicleFragment;
 import br.com.versalius.carona.fragments.ProfileFragment;
+import br.com.versalius.carona.interfaces.AddFragmentAsActivity;
 import br.com.versalius.carona.interfaces.MessageDeliveredListener;
 import br.com.versalius.carona.interfaces.UserUpdateListener;
 import br.com.versalius.carona.models.User;
 import br.com.versalius.carona.models.Vehicle;
 import br.com.versalius.carona.utils.CustomSnackBar;
-import br.com.versalius.carona.utils.PreferencesHelper;
 import br.com.versalius.carona.utils.SessionHelper;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         AvailableRidesFragment.OnRideListScrollListener,
         MessageDeliveredListener,
-        UserUpdateListener{
+        UserUpdateListener,
+        AddFragmentAsActivity {
 
     private FloatingActionMenu fab;
     private CoordinatorLayout coordinatorLayout;
@@ -56,6 +58,12 @@ public class MainActivity extends AppCompatActivity
     private TextView tvUsername;
     private SimpleDraweeView userPhoto;
     private TextView tvCurrentVehicle;
+    private ActionBarDrawerToggle toggle;
+
+    //Pra saber o que colocar quando voltar de um fragmeto que não é chamado do Drawer
+    private String lastToolbarTitle = "";
+    //Pra deixar os ícones do menu da Toolbar invisíveis
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,9 +102,9 @@ public class MainActivity extends AppCompatActivity
         updateDrawerUserInfo(user);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         tvCurrentVehicle = (TextView) navHeader.findViewById(R.id.tvCurrentVehicle);
@@ -160,12 +168,36 @@ public class MainActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+
+        //Se mesmo depois do pop (que acontece no super.onBackPressed()) ainda houver fragmento no backstack...
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            //Não faz nada...
+//            toggle.setDrawerIndicatorEnabled(false);
+//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } else {
+            if(!lastToolbarTitle.isEmpty()){
+                toolbar.setTitle(lastToolbarTitle);
+                lastToolbarTitle = "";
+            }
+            restoreToolbar();
+        }
+    }
+
+    private void restoreToolbar() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        toggle.setDrawerIndicatorEnabled(true);
+
+        //Restaura ícones do menu
+        for (int i = 0; i < menu.size(); i++){
+            menu.getItem(i).setVisible(true);
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -176,12 +208,12 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_logout) {
-            LogoutDialog dialog = new LogoutDialog();
-            dialog.setMessage(getString(R.string.dialog_message_logout));
-            dialog.show(this.getSupportFragmentManager(), "dialog");
-            return true;
+        switch (id) {
+            case R.id.action_logout:
+                LogoutDialog dialog = new LogoutDialog();
+                dialog.setMessage(getString(R.string.dialog_message_logout));
+                dialog.show(this.getSupportFragmentManager(), "dialog");
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -190,6 +222,15 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        //Caso o usuário puxe o drawer de um fragmento que não está nele
+        //A toolbar é restaurada...
+        restoreToolbar();
+        //E o backstack é esvaziado
+        FragmentManager fm = getSupportFragmentManager();
+        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            fm.popBackStack();
+        }
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -197,9 +238,9 @@ public class MainActivity extends AppCompatActivity
 //            fab.showMenuButton(true);
             toolbar.setTitle(getString(R.string.title_fragment_available_rides));
             showFragment(AvailableRidesFragment.newInstance());
-        } else if (id == R.id.nav_my_profile) {
-            toolbar.setTitle(new SessionHelper(this).getUserFullName()+" (você)");
-            showFragment(ProfileFragment.newInstance());
+//        } else if (id == R.id.nav_my_profile) {
+//            toolbar.setTitle(new SessionHelper(this).getUserFullName()+" (você)");
+//            showFragment(ProfileFragment.newInstance());
         } else if (id == R.id.nav_my_ride) {
 
         } else if (id == R.id.nav_change_vehicle) {
@@ -254,6 +295,36 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void OnVehicleUpdate(Vehicle vehicle) {
         updateDrawerVehicleInfo(vehicle);
+    }
+
+    @Override
+    public void onAddFragment(Fragment fragment, String title) {
+        lastToolbarTitle = getSupportActionBar().getTitle().toString();
+
+        toggle.setDrawerIndicatorEnabled(false);
+        toggle.syncState();
+
+        toggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+        if(fragment instanceof ProfileFragment){
+            //Se for o fragmento de perfil, esconde tudo. Fica só o Home
+            for (int i = 0; i < menu.size(); i++){
+                menu.getItem(i).setVisible(false);
+            }
+        }
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setTitle(title);
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_main,
+                fragment)
+                .addToBackStack(null)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit();
     }
 
     public static class LogoutDialog extends DialogFragment {
