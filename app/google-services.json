@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "831197719685",
+    "firebase_url": "https://carona-uesc.firebaseio.com",
+    "project_id": "carona-uesc",
+    "storage_bucket": "carona-uesc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831197719685:android:538081bf3afaba91",
+        "android_client_info": {
+          "package_name": "br.com.versalius.carona"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "831197719685-15pq2dmuv6m09lk55rhprpojl4vh567h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.versalius.carona",
+            "certificate_hash": "cbae42b51296ddae42af473ed924c3202cc03000"
+          }
+        },
+        {
+          "client_id": "831197719685-4ffm4un6on5m0enf9o0lg2uoo78vbbvh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWBybRpMRoZjRwYpuyP7iL4jWozx4K2qQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "831197719685-4ffm4un6on5m0enf9o0lg2uoo78vbbvh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
